@@ -7,6 +7,14 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐭</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>/* Papa Parse v5.4.1 | MIT License | https://github.com/mholt/PapaParse */
+/* @license
+Papa Parse
+v5.4.1
+https://github.com/mholt/PapaParse
+License: MIT
+*/
+!function(e,t){"function"==typeof define&&define.amd?define([],t):"object"==typeof module&&"undefined"!=typeof exports?module.exports=t():e.Papa=t()}(this,function s(){"use strict";var f="undefined"!=typeof self?self:"undefined"!=typeof window?window:void 0!==f?f:{};var n=!f.document&&!!f.postMessage,o=f.IS_PAPA_WORKER||!1,a={},u=0,b={parse:function(e,t){var r=(t=t||{}).dynamicTyping||!1;J(r)&&(t.dynamicTypingFunction=r,r={});if(t.dynamicTyping=r,t.transform=!!J(t.transform)&&t.transform,t.worker&&b.WORKERS_SUPPORTED){var i=function(){if(!b.WORKERS_SUPPORTED)return!1;var e=(r=f.URL||f.webkitURL||null,i=s.toString(),b.BLOB_URL||(b.BLOB_URL=r.createObjectURL(new Blob(["var global = (function() { if (typeof self !== 'undefined') { return self; } if (typeof window !== 'undefined') { return window; } if (typeof global !== 'undefined') { return global; } return {}; })(); global.IS_PAPA_WORKER=true; ","(",i,")();"],{type:"text/javascript"})))),t=new f.Worker(e);var r,i;return t.onmessage=_,t.id=u++,a[t.id]=t}();return i.userStep=t.step,i.userChunk=t.chunk,i.userComplete=t.complete,i.userError=t.error,t.step=J(t.step),t.chunk=J(t.chunk),t.complete=J(t.complete),t.error=J(t.error),delete t.worker,void i.postMessage({input:e,config:t,workerId:i.id})}var n=null;b.NODE_STREAM_INPUT,"string"==typeof e?(e=function(e){if(65279===e.charCodeAt(0))return e.slice(1);return e}(e),n=t.download?new l(t):new p(t)):!0===e.readable&&J(e.read)&&J(e.on)?n=new g(t):(f.File&&e instanceof File||e instanceof Object)&&(n=new c(t));return n.stream(e)},unparse:function(e,t){var n=!1,_=!0,m=",",y="\r\n",s='"',a=s+s,r=!1,i=null,o=!1;!function(){if("object"!=typeof t)return;"string"!=typeof t.delimiter||b.BAD_DELIMITERS.filter(function(e){return-1!==t.delimiter.indexOf(e)}).length||(m=t.delimiter);("boolean"==typeof t.quotes||"function"==typeof t.quotes||Array.isArray(t.quotes))&&(n=t.quotes);"boolean"!=typeof t.skipEmptyLines&&"string"!=typeof t.skipEmptyLines||(r=t.skipEmptyLines);"string"==typeof t.newline&&(y=t.newline);"string"==typeof t.quoteChar&&(s=t.quoteChar);"boolean"==typeof t.header&&(_=t.header);if(Array.isArray(t.columns)){if(0===t.columns.length)throw new Error("Option columns is empty");i=t.columns}void 0!==t.escapeChar&&(a=t.escapeChar+s);("boolean"==typeof t.escapeFormulae||t.escapeFormulae instanceof RegExp)&&(o=t.escapeFormulae instanceof RegExp?t.escapeFormulae:/^[=+\-@\t\r].*$/)}();var u=new RegExp(Q(s),"g");"string"==typeof e&&(e=JSON.parse(e));if(Array.isArray(e)){if(!e.length||Array.isArray(e[0]))return h(null,e,r);if("object"==typeof e[0])return h(i||Object.keys(e[0]),e,r)}else if("object"==typeof e)return"string"==typeof e.data&&(e.data=JSON.parse(e.data)),Array.isArray(e.data)&&(e.fields||(e.fields=e.meta&&e.meta.fields||i),e.fields||(e.fields=Array.isArray(e.data[0])?e.fields:"object"==typeof e.data[0]?Object.keys(e.data[0]):[]),Array.isArray(e.data[0])||"object"==typeof e.data[0]||(e.data=[e.data])),h(e.fields||[],e.data||[],r);throw new Error("Unable to serialize unrecognized input");function h(e,t,r){var i="";"string"==typeof e&&(e=JSON.parse(e)),"string"==typeof t&&(t=JSON.parse(t));var n=Array.isArray(e)&&0<e.length,s=!Array.isArray(t[0]);if(n&&_){for(var a=0;a<e.length;a++)0<a&&(i+=m),i+=v(e[a],a);0<t.length&&(i+=y)}for(var o=0;o<t.length;o++){var u=n?e.length:t[o].length,h=!1,f=n?0===Object.keys(t[o]).length:0===t[o].length;if(r&&!n&&(h="greedy"===r?""===t[o].join("").trim():1===t[o].length&&0===t[o][0].length),"greedy"===r&&n){for(var d=[],l=0;l<u;l++){var c=s?e[l]:l;d.push(t[o][c])}h=""===d.join("").trim()}if(!h){for(var p=0;p<u;p++){0<p&&!f&&(i+=m);var g=n&&s?e[p]:p;i+=v(t[o][g],p)}o<t.length-1&&(!r||0<u&&!f)&&(i+=y)}}return i}function v(e,t){if(null==e)return"";if(e.constructor===Date)return JSON.stringify(e).slice(1,25);var r=!1;o&&"string"==typeof e&&o.test(e)&&(e="'"+e,r=!0);var i=e.toString().replace(u,a);return(r=r||!0===n||"function"==typeof n&&n(e,t)||Array.isArray(n)&&n[t]||function(e,t){for(var r=0;r<t.length;r++)if(-1<e.indexOf(t[r]))return!0;return!1}(i,b.BAD_DELIMITERS)||-1<i.indexOf(m)||" "===i.charAt(0)||" "===i.charAt(i.length-1))?s+i+s:i}}};if(b.RECORD_SEP=String.fromCharCode(30),b.UNIT_SEP=String.fromCharCode(31),b.BYTE_ORDER_MARK="\ufeff",b.BAD_DELIMITERS=["\r","\n",'"',b.BYTE_ORDER_MARK],b.WORKERS_SUPPORTED=!n&&!!f.Worker,b.NODE_STREAM_INPUT=1,b.LocalChunkSize=10485760,b.RemoteChunkSize=5242880,b.DefaultDelimiter=",",b.Parser=E,b.ParserHandle=r,b.NetworkStreamer=l,b.FileStreamer=c,b.StringStreamer=p,b.ReadableStreamStreamer=g,f.jQuery){var d=f.jQuery;d.fn.parse=function(o){var r=o.config||{},u=[];return this.each(function(e){if(!("INPUT"===d(this).prop("tagName").toUpperCase()&&"file"===d(this).attr("type").toLowerCase()&&f.FileReader)||!this.files||0===this.files.length)return!0;for(var t=0;t<this.files.length;t++)u.push({file:this.files[t],inputElem:this,instanceConfig:d.extend({},r)})}),e(),this;function e(){if(0!==u.length){var e,t,r,i,n=u[0];if(J(o.before)){var s=o.before(n.file,n.inputElem);if("object"==typeof s){if("abort"===s.action)return e="AbortError",t=n.file,r=n.inputElem,i=s.reason,void(J(o.error)&&o.error({name:e},t,r,i));if("skip"===s.action)return void h();"object"==typeof s.config&&(n.instanceConfig=d.extend(n.instanceConfig,s.config))}else if("skip"===s)return void h()}var a=n.instanceConfig.complete;n.instanceConfig.complete=function(e){J(a)&&a(e,n.file,n.inputElem),h()},b.parse(n.file,n.instanceConfig)}else J(o.complete)&&o.complete()}function h(){u.splice(0,1),e()}}}function h(e){this._handle=null,this._finished=!1,this._completed=!1,this._halted=!1,this._input=null,this._baseIndex=0,this._partialLine="",this._rowCount=0,this._start=0,this._nextChunk=null,this.isFirstChunk=!0,this._completeResults={data:[],errors:[],meta:{}},function(e){var t=w(e);t.chunkSize=parseInt(t.chunkSize),e.step||e.chunk||(t.chunkSize=null);this._handle=new r(t),(this._handle.streamer=this)._config=t}.call(this,e),this.parseChunk=function(e,t){if(this.isFirstChunk&&J(this._config.beforeFirstChunk)){var r=this._config.beforeFirstChunk(e);void 0!==r&&(e=r)}this.isFirstChunk=!1,this._halted=!1;var i=this._partialLine+e;this._partialLine="";var n=this._handle.parse(i,this._baseIndex,!this._finished);if(!this._handle.paused()&&!this._handle.aborted()){var s=n.meta.cursor;this._finished||(this._partialLine=i.substring(s-this._baseIndex),this._baseIndex=s),n&&n.data&&(this._rowCount+=n.data.length);var a=this._finished||this._config.preview&&this._rowCount>=this._config.preview;if(o)f.postMessage({results:n,workerId:b.WORKER_ID,finished:a});else if(J(this._config.chunk)&&!t){if(this._config.chunk(n,this._handle),this._handle.paused()||this._handle.aborted())return void(this._halted=!0);n=void 0,this._completeResults=void 0}return this._config.step||this._config.chunk||(this._completeResults.data=this._completeResults.data.concat(n.data),this._completeResults.errors=this._completeResults.errors.concat(n.errors),this._completeResults.meta=n.meta),this._completed||!a||!J(this._config.complete)||n&&n.meta.aborted||(this._config.complete(this._completeResults,this._input),this._completed=!0),a||n&&n.meta.paused||this._nextChunk(),n}this._halted=!0},this._sendError=function(e){J(this._config.error)?this._config.error(e):o&&this._config.error&&f.postMessage({workerId:b.WORKER_ID,error:e,finished:!1})}}function l(e){var i;(e=e||{}).chunkSize||(e.chunkSize=b.RemoteChunkSize),h.call(this,e),this._nextChunk=n?function(){this._readChunk(),this._chunkLoaded()}:function(){this._readChunk()},this.stream=function(e){this._input=e,this._nextChunk()},this._readChunk=function(){if(this._finished)this._chunkLoaded();else{if(i=new XMLHttpRequest,this._config.withCredentials&&(i.withCredentials=this._config.withCredentials),n||(i.onload=v(this._chunkLoaded,this),i.onerror=v(this._chunkError,this)),i.open(this._config.downloadRequestBody?"POST":"GET",this._input,!n),this._config.downloadRequestHeaders){var e=this._config.downloadRequestHeaders;for(var t in e)i.setRequestHeader(t,e[t])}if(this._config.chunkSize){var r=this._start+this._config.chunkSize-1;i.setRequestHeader("Range","bytes="+this._start+"-"+r)}try{i.send(this._config.downloadRequestBody)}catch(e){this._chunkError(e.message)}n&&0===i.status&&this._chunkError()}},this._chunkLoaded=function(){4===i.readyState&&(i.status<200||400<=i.status?this._chunkError():(this._start+=this._config.chunkSize?this._config.chunkSize:i.responseText.length,this._finished=!this._config.chunkSize||this._start>=function(e){var t=e.getResponseHeader("Content-Range");if(null===t)return-1;return parseInt(t.substring(t.lastIndexOf("/")+1))}(i),this.parseChunk(i.responseText)))},this._chunkError=function(e){var t=i.statusText||e;this._sendError(new Error(t))}}function c(e){var i,n;(e=e||{}).chunkSize||(e.chunkSize=b.LocalChunkSize),h.call(this,e);var s="undefined"!=typeof FileReader;this.stream=function(e){this._input=e,n=e.slice||e.webkitSlice||e.mozSlice,s?((i=new FileReader).onload=v(this._chunkLoaded,this),i.onerror=v(this._chunkError,this)):i=new FileReaderSync,this._nextChunk()},this._nextChunk=function(){this._finished||this._config.preview&&!(this._rowCount<this._config.preview)||this._readChunk()},this._readChunk=function(){var e=this._input;if(this._config.chunkSize){var t=Math.min(this._start+this._config.chunkSize,this._input.size);e=n.call(e,this._start,t)}var r=i.readAsText(e,this._config.encoding);s||this._chunkLoaded({target:{result:r}})},this._chunkLoaded=function(e){this._start+=this._config.chunkSize,this._finished=!this._config.chunkSize||this._start>=this._input.size,this.parseChunk(e.target.result)},this._chunkError=function(){this._sendError(i.error)}}function p(e){var r;h.call(this,e=e||{}),this.stream=function(e){return r=e,this._nextChunk()},this._nextChunk=function(){if(!this._finished){var e,t=this._config.chunkSize;return t?(e=r.substring(0,t),r=r.substring(t)):(e=r,r=""),this._finished=!r,this.parseChunk(e)}}}function g(e){h.call(this,e=e||{});var t=[],r=!0,i=!1;this.pause=function(){h.prototype.pause.apply(this,arguments),this._input.pause()},this.resume=function(){h.prototype.resume.apply(this,arguments),this._input.resume()},this.stream=function(e){this._input=e,this._input.on("data",this._streamData),this._input.on("end",this._streamEnd),this._input.on("error",this._streamError)},this._checkIsFinished=function(){i&&1===t.length&&(this._finished=!0)},this._nextChunk=function(){this._checkIsFinished(),t.length?this.parseChunk(t.shift()):r=!0},this._streamData=v(function(e){try{t.push("string"==typeof e?e:e.toString(this._config.encoding)),r&&(r=!1,this._checkIsFinished(),this.parseChunk(t.shift()))}catch(e){this._streamError(e)}},this),this._streamError=v(function(e){this._streamCleanUp(),this._sendError(e)},this),this._streamEnd=v(function(){this._streamCleanUp(),i=!0,this._streamData("")},this),this._streamCleanUp=v(function(){this._input.removeListener("data",this._streamData),this._input.removeListener("end",this._streamEnd),this._input.removeListener("error",this._streamError)},this)}function r(m){var a,o,u,i=Math.pow(2,53),n=-i,s=/^\s*-?(\d+\.?|\.\d+|\d+\.\d+)([eE][-+]?\d+)?\s*$/,h=/^((\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)))$/,t=this,r=0,f=0,d=!1,e=!1,l=[],c={data:[],errors:[],meta:{}};if(J(m.step)){var p=m.step;m.step=function(e){if(c=e,_())g();else{if(g(),0===c.data.length)return;r+=e.data.length,m.preview&&r>m.preview?o.abort():(c.data=c.data[0],p(c,t))}}}function y(e){return"greedy"===m.skipEmptyLines?""===e.join("").trim():1===e.length&&0===e[0].length}function g(){return c&&u&&(k("Delimiter","UndetectableDelimiter","Unable to auto-detect delimiting character; defaulted to '"+b.DefaultDelimiter+"'"),u=!1),m.skipEmptyLines&&(c.data=c.data.filter(function(e){return!y(e)})),_()&&function(){if(!c)return;function e(e,t){J(m.transformHeader)&&(e=m.transformHeader(e,t)),l.push(e)}if(Array.isArray(c.data[0])){for(var t=0;_()&&t<c.data.length;t++)c.data[t].forEach(e);c.data.splice(0,1)}else c.data.forEach(e)}(),function(){if(!c||!m.header&&!m.dynamicTyping&&!m.transform)return c;function e(e,t){var r,i=m.header?{}:[];for(r=0;r<e.length;r++){var n=r,s=e[r];m.header&&(n=r>=l.length?"__parsed_extra":l[r]),m.transform&&(s=m.transform(s,n)),s=v(n,s),"__parsed_extra"===n?(i[n]=i[n]||[],i[n].push(s)):i[n]=s}return m.header&&(r>l.length?k("FieldMismatch","TooManyFields","Too many fields: expected "+l.length+" fields but parsed "+r,f+t):r<l.length&&k("FieldMismatch","TooFewFields","Too few fields: expected "+l.length+" fields but parsed "+r,f+t)),i}var t=1;!c.data.length||Array.isArray(c.data[0])?(c.data=c.data.map(e),t=c.data.length):c.data=e(c.data,0);m.header&&c.meta&&(c.meta.fields=l);return f+=t,c}()}function _(){return m.header&&0===l.length}function v(e,t){return r=e,m.dynamicTypingFunction&&void 0===m.dynamicTyping[r]&&(m.dynamicTyping[r]=m.dynamicTypingFunction(r)),!0===(m.dynamicTyping[r]||m.dynamicTyping)?"true"===t||"TRUE"===t||"false"!==t&&"FALSE"!==t&&(function(e){if(s.test(e)){var t=parseFloat(e);if(n<t&&t<i)return!0}return!1}(t)?parseFloat(t):h.test(t)?new Date(t):""===t?null:t):t;var r}function k(e,t,r,i){var n={type:e,code:t,message:r};void 0!==i&&(n.row=i),c.errors.push(n)}this.parse=function(e,t,r){var i=m.quoteChar||'"';if(m.newline||(m.newline=function(e,t){e=e.substring(0,1048576);var r=new RegExp(Q(t)+"([^]*?)"+Q(t),"gm"),i=(e=e.replace(r,"")).split("\r"),n=e.split("\n"),s=1<n.length&&n[0].length<i[0].length;if(1===i.length||s)return"\n";for(var a=0,o=0;o<i.length;o++)"\n"===i[o][0]&&a++;return a>=i.length/2?"\r\n":"\r"}(e,i)),u=!1,m.delimiter)J(m.delimiter)&&(m.delimiter=m.delimiter(e),c.meta.delimiter=m.delimiter);else{var n=function(e,t,r,i,n){var s,a,o,u;n=n||[",","\t","|",";",b.RECORD_SEP,b.UNIT_SEP];for(var h=0;h<n.length;h++){var f=n[h],d=0,l=0,c=0;o=void 0;for(var p=new E({comments:i,delimiter:f,newline:t,preview:10}).parse(e),g=0;g<p.data.length;g++)if(r&&y(p.data[g]))c++;else{var _=p.data[g].length;l+=_,void 0!==o?0<_&&(d+=Math.abs(_-o),o=_):o=_}0<p.data.length&&(l/=p.data.length-c),(void 0===a||d<=a)&&(void 0===u||u<l)&&1.99<l&&(a=d,s=f,u=l)}return{successful:!!(m.delimiter=s),bestDelimiter:s}}(e,m.newline,m.skipEmptyLines,m.comments,m.delimitersToGuess);n.successful?m.delimiter=n.bestDelimiter:(u=!0,m.delimiter=b.DefaultDelimiter),c.meta.delimiter=m.delimiter}var s=w(m);return m.preview&&m.header&&s.preview++,a=e,o=new E(s),c=o.parse(a,t,r),g(),d?{meta:{paused:!0}}:c||{meta:{paused:!1}}},this.paused=function(){return d},this.pause=function(){d=!0,o.abort(),a=J(m.chunk)?"":a.substring(o.getCharIndex())},this.resume=function(){t.streamer._halted?(d=!1,t.streamer.parseChunk(a,!0)):setTimeout(t.resume,3)},this.aborted=function(){return e},this.abort=function(){e=!0,o.abort(),c.meta.aborted=!0,J(m.complete)&&m.complete(c),a=""}}function Q(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}function E(j){var z,M=(j=j||{}).delimiter,P=j.newline,U=j.comments,q=j.step,N=j.preview,B=j.fastMode,K=z=void 0===j.quoteChar||null===j.quoteChar?'"':j.quoteChar;if(void 0!==j.escapeChar&&(K=j.escapeChar),("string"!=typeof M||-1<b.BAD_DELIMITERS.indexOf(M))&&(M=","),U===M)throw new Error("Comment character same as delimiter");!0===U?U="#":("string"!=typeof U||-1<b.BAD_DELIMITERS.indexOf(U))&&(U=!1),"\n"!==P&&"\r"!==P&&"\r\n"!==P&&(P="\n");var W=0,H=!1;this.parse=function(i,t,r){if("string"!=typeof i)throw new Error("Input must be a string");var n=i.length,e=M.length,s=P.length,a=U.length,o=J(q),u=[],h=[],f=[],d=W=0;if(!i)return L();if(j.header&&!t){var l=i.split(P)[0].split(M),c=[],p={},g=!1;for(var _ in l){var m=l[_];J(j.transformHeader)&&(m=j.transformHeader(m,_));var y=m,v=p[m]||0;for(0<v&&(g=!0,y=m+"_"+v),p[m]=v+1;c.includes(y);)y=y+"_"+v;c.push(y)}if(g){var k=i.split(P);k[0]=c.join(M),i=k.join(P)}}if(B||!1!==B&&-1===i.indexOf(z)){for(var b=i.split(P),E=0;E<b.length;E++){if(f=b[E],W+=f.length,E!==b.length-1)W+=P.length;else if(r)return L();if(!U||f.substring(0,a)!==U){if(o){if(u=[],I(f.split(M)),F(),H)return L()}else I(f.split(M));if(N&&N<=E)return u=u.slice(0,N),L(!0)}}return L()}for(var w=i.indexOf(M,W),R=i.indexOf(P,W),C=new RegExp(Q(K)+Q(z),"g"),S=i.indexOf(z,W);;)if(i[W]!==z)if(U&&0===f.length&&i.substring(W,W+a)===U){if(-1===R)return L();W=R+s,R=i.indexOf(P,W),w=i.indexOf(M,W)}else if(-1!==w&&(w<R||-1===R))f.push(i.substring(W,w)),W=w+e,w=i.indexOf(M,W);else{if(-1===R)break;if(f.push(i.substring(W,R)),D(R+s),o&&(F(),H))return L();if(N&&u.length>=N)return L(!0)}else for(S=W,W++;;){if(-1===(S=i.indexOf(z,S+1)))return r||h.push({type:"Quotes",code:"MissingQuotes",message:"Quoted field unterminated",row:u.length,index:W}),T();if(S===n-1)return T(i.substring(W,S).replace(C,z));if(z!==K||i[S+1]!==K){if(z===K||0===S||i[S-1]!==K){-1!==w&&w<S+1&&(w=i.indexOf(M,S+1)),-1!==R&&R<S+1&&(R=i.indexOf(P,S+1));var O=A(-1===R?w:Math.min(w,R));if(i.substr(S+1+O,e)===M){f.push(i.substring(W,S).replace(C,z)),i[W=S+1+O+e]!==z&&(S=i.indexOf(z,W)),w=i.indexOf(M,W),R=i.indexOf(P,W);break}var x=A(R);if(i.substring(S+1+x,S+1+x+s)===P){if(f.push(i.substring(W,S).replace(C,z)),D(S+1+x+s),w=i.indexOf(M,W),S=i.indexOf(z,W),o&&(F(),H))return L();if(N&&u.length>=N)return L(!0);break}h.push({type:"Quotes",code:"InvalidQuotes",message:"Trailing quote on quoted field is malformed",row:u.length,index:W}),S++}}else S++}return T();function I(e){u.push(e),d=W}function A(e){var t=0;if(-1!==e){var r=i.substring(S+1,e);r&&""===r.trim()&&(t=r.length)}return t}function T(e){return r||(void 0===e&&(e=i.substring(W)),f.push(e),W=n,I(f),o&&F()),L()}function D(e){W=e,I(f),f=[],R=i.indexOf(P,W)}function L(e){return{data:u,errors:h,meta:{delimiter:M,linebreak:P,aborted:H,truncated:!!e,cursor:d+(t||0)}}}function F(){q(L()),u=[],h=[]}},this.abort=function(){H=!0},this.getCharIndex=function(){return W}}function _(e){var t=e.data,r=a[t.workerId],i=!1;if(t.error)r.userError(t.error,t.file);else if(t.results&&t.results.data){var n={abort:function(){i=!0,m(t.workerId,{data:[],errors:[],meta:{aborted:!0}})},pause:y,resume:y};if(J(r.userStep)){for(var s=0;s<t.results.data.length&&(r.userStep({data:t.results.data[s],errors:t.results.errors,meta:t.results.meta},n),!i);s++);delete t.results}else J(r.userChunk)&&(r.userChunk(t.results,n,t.file),delete t.results)}t.finished&&!i&&m(t.workerId,t.results)}function m(e,t){var r=a[e];J(r.userComplete)&&r.userComplete(t),r.terminate(),delete a[e]}function y(){throw new Error("Not implemented.")}function w(e){if("object"!=typeof e||null===e)return e;var t=Array.isArray(e)?[]:{};for(var r in e)t[r]=w(e[r]);return t}function v(e,t){return function(){e.apply(t,arguments)}}function J(e){return"function"==typeof e}return o&&(f.onmessage=function(e){var t=e.data;void 0===b.WORKER_ID&&t&&(b.WORKER_ID=t.workerId);if("string"==typeof t.input)f.postMessage({workerId:b.WORKER_ID,results:b.parse(t.input,t.config),finished:!0});else if(f.File&&t.input instanceof File||t.input instanceof Object){var r=b.parse(t.input,t.config);r&&f.postMessage({workerId:b.WORKER_ID,results:r,finished:!0})}}),(l.prototype=Object.create(h.prototype)).constructor=l,(c.prototype=Object.create(h.prototype)).constructor=c,(p.prototype=Object.create(p.prototype)).constructor=p,(g.prototype=Object.create(h.prototype)).constructor=g,b});</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -47,7 +55,6 @@ body {
   min-height: 100vh;
 }
 
-/* Layout */
 .app {
   max-width: 960px;
   margin: 0 auto;
@@ -69,14 +76,12 @@ header h1 {
   margin-bottom: 0.3rem;
 }
 
-header h1 span {
-  color: var(--accent);
-}
+header h1 span { color: var(--accent); }
 
 header p {
   color: var(--text-secondary);
   font-size: 0.93rem;
-  max-width: 560px;
+  max-width: 620px;
   margin: 0 auto;
 }
 
@@ -86,11 +91,8 @@ header p a {
   text-underline-offset: 2px;
 }
 
-header p a:hover {
-  color: var(--accent-hover);
-}
+header p a:hover { color: var(--accent-hover); }
 
-/* Cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -126,7 +128,6 @@ header p a:hover {
   flex-shrink: 0;
 }
 
-/* Upload Zone */
 .upload-zone {
   border: 2px dashed var(--border-strong);
   border-radius: var(--radius);
@@ -150,15 +151,8 @@ header p a:hover {
 
 .upload-zone.dragover svg { color: var(--accent); }
 
-.upload-zone p {
-  font-size: 0.93rem;
-  color: var(--text-secondary);
-}
-
-.upload-zone p strong {
-  color: var(--accent);
-  cursor: pointer;
-}
+.upload-zone p { font-size: 0.93rem; color: var(--text-secondary); }
+.upload-zone p strong { color: var(--accent); cursor: pointer; }
 
 .upload-zone .hint {
   font-size: 0.8rem;
@@ -173,9 +167,7 @@ header p a:hover {
   cursor: pointer;
 }
 
-.upload-zone .hint a:hover {
-  color: var(--accent-hover);
-}
+.upload-zone .hint a:hover { color: var(--accent-hover); }
 
 .file-loaded {
   display: flex;
@@ -191,7 +183,6 @@ header p a:hover {
 }
 
 .file-loaded .icon { font-size: 1.2rem; }
-
 .file-loaded .name { flex: 1; font-family: var(--mono); font-size: 0.82rem; }
 
 .file-loaded button {
@@ -206,7 +197,6 @@ header p a:hover {
 
 .file-loaded button:hover { color: var(--danger); }
 
-/* Stats Row */
 .stats-row {
   display: flex;
   gap: 1rem;
@@ -241,7 +231,6 @@ header p a:hover {
 
 .stat-chip.has-groups .val { color: var(--orange); }
 
-/* Group Config */
 .group-controls {
   display: flex;
   align-items: center;
@@ -291,11 +280,7 @@ header p a:hover {
   background: var(--surface);
 }
 
-.group-labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
+.group-labels { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .group-label-input {
   position: relative;
@@ -356,11 +341,8 @@ header p a:hover {
   color: var(--danger);
 }
 
-.group-label-input.can-delete .delete-group {
-  display: flex;
-}
+.group-label-input.can-delete .delete-group { display: flex; }
 
-/* Buttons */
 .btn {
   font-family: var(--font);
   font-size: 0.9rem;
@@ -375,34 +357,15 @@ header p a:hover {
   gap: 0.5rem;
 }
 
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-}
-
+.btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: var(--accent-hover); }
-.btn-primary:disabled {
-  background: var(--border);
-  color: var(--text-tertiary);
-  cursor: not-allowed;
-}
+.btn-primary:disabled { background: var(--border); color: var(--text-tertiary); cursor: not-allowed; }
 
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 .btn-secondary:hover { background: var(--surface-alt); border-color: var(--border-strong); }
 
-.btn-group {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
+.btn-group { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
 
-/* Data Table */
 .table-wrapper {
   overflow-x: auto;
   border: 1px solid var(--border);
@@ -410,11 +373,7 @@ header p a:hover {
   margin-top: 1rem;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 
 thead th {
   background: var(--surface-alt);
@@ -440,13 +399,9 @@ tbody td {
 }
 
 tbody tr:last-child td { border-bottom: none; }
-
 tbody tr:hover { background: var(--surface-alt); }
 
-td.group-cell {
-  font-family: var(--font);
-  font-weight: 600;
-}
+td.group-cell { font-family: var(--font); font-weight: 600; }
 
 .group-badge {
   display: inline-block;
@@ -456,15 +411,9 @@ td.group-cell {
   font-weight: 600;
 }
 
-.group-badge.preassigned {
-  opacity: 0.6;
-}
+.group-badge.preassigned { opacity: 0.6; }
+.group-badge.newly-assigned { box-shadow: 0 0 0 2px var(--accent); }
 
-.group-badge.newly-assigned {
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-/* Summary Table */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -547,7 +496,6 @@ td.group-cell {
   color: var(--text-secondary);
 }
 
-/* Messages */
 .message {
   padding: 0.75rem 1rem;
   border-radius: var(--radius);
@@ -555,28 +503,13 @@ td.group-cell {
   margin-top: 1rem;
 }
 
-.message.info {
-  background: var(--blue-light);
-  color: var(--blue);
-  border: 1px solid #c3d5e8;
-}
+.message.info { background: var(--blue-light); color: var(--blue); border: 1px solid #c3d5e8; }
+.message.warn { background: var(--orange-light); color: var(--orange); border: 1px solid #f0d5b8; }
+.message.error { background: var(--danger-light); color: var(--danger); border: 1px solid #f0c0c4; }
+.message.success { background: var(--accent-light); color: var(--accent-hover); border: 1px solid #b7dfc4; }
 
-.message.warn {
-  background: var(--orange-light);
-  color: var(--orange);
-  border: 1px solid #f0d5b8;
-}
-
-.message.error {
-  background: var(--danger-light);
-  color: var(--danger);
-  border: 1px solid #f0c0c4;
-}
-
-/* Hidden */
 .hidden { display: none !important; }
 
-/* Responsive */
 @media (max-width: 600px) {
   .app { padding: 1.25rem 1rem 3rem; }
   header h1 { font-size: 1.4rem; }
@@ -584,26 +517,24 @@ td.group-cell {
   .stats-row { gap: 0.5rem; }
 }
 
-/* Color palette for groups */
-.gc-0  { background: #d8f3dc; color: #1b4332; }
-.gc-1  { background: #e3ecf7; color: #1d3557; }
-.gc-2  { background: #fdf0e2; color: #7c4a1a; }
-.gc-3  { background: #f3e8f9; color: #5a2d76; }
-.gc-4  { background: #fde8ea; color: #8b1a25; }
-.gc-5  { background: #e0f5f0; color: #1a5c4c; }
-.gc-6  { background: #fef6d8; color: #6b5a10; }
-.gc-7  { background: #e8eaf3; color: #333a5c; }
+.gc-0 { background: #d8f3dc; color: #1b4332; }
+.gc-1 { background: #e3ecf7; color: #1d3557; }
+.gc-2 { background: #fdf0e2; color: #7c4a1a; }
+.gc-3 { background: #f3e8f9; color: #5a2d76; }
+.gc-4 { background: #fde8ea; color: #8b1a25; }
+.gc-5 { background: #e0f5f0; color: #1a5c4c; }
+.gc-6 { background: #fef6d8; color: #6b5a10; }
+.gc-7 { background: #e8eaf3; color: #333a5c; }
 
-.dot-0  { background: #2d6a4f; }
-.dot-1  { background: #1d3557; }
-.dot-2  { background: #b56727; }
-.dot-3  { background: #7b3fa0; }
-.dot-4  { background: #c1121f; }
-.dot-5  { background: #1a7a63; }
-.dot-6  { background: #9a8520; }
-.dot-7  { background: #4a4f70; }
+.dot-0 { background: #2d6a4f; }
+.dot-1 { background: #1d3557; }
+.dot-2 { background: #b56727; }
+.dot-3 { background: #7b3fa0; }
+.dot-4 { background: #c1121f; }
+.dot-5 { background: #1a7a63; }
+.dot-6 { background: #9a8520; }
+.dot-7 { background: #4a4f70; }
 
-/* Seed display */
 .seed-display {
   display: flex;
   align-items: center;
@@ -611,6 +542,7 @@ td.group-cell {
   margin-top: 0.75rem;
   font-size: 0.82rem;
   color: var(--text-tertiary);
+  flex-wrap: wrap;
 }
 
 .seed-display code {
@@ -622,13 +554,193 @@ td.group-cell {
   font-size: 0.78rem;
   color: var(--text-secondary);
 }
+
+.options-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.option-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.87rem;
+}
+
+.option-group label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.option-group input[type="text"] {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  width: 120px;
+}
+
+.option-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+}
+
+.option-group select {
+  font-family: var(--font);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.option-group select:focus { outline: none; border-color: var(--accent); }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  user-select: none;
+}
+
+.toggle input { display: none; }
+
+.toggle .track {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--border-strong);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle .track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.toggle input:checked + .track { background: var(--accent); }
+.toggle input:checked + .track::after { transform: translateX(16px); }
+
+.balance-section { margin-top: 1.25rem; }
+
+.balance-section h4 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.smd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.smd-table thead th {
+  background: var(--surface-alt);
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  position: static;
+}
+
+.smd-table thead th:last-child { border-right: none; }
+.smd-table thead th:first-child { text-align: left; }
+
+.smd-table tbody td {
+  padding: 0.35rem 0.6rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.smd-table tbody td:last-child { border-right: none; }
+.smd-table tbody tr:last-child td { border-bottom: none; }
+
+.smd-table tbody td:first-child {
+  text-align: left;
+  font-family: var(--font);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.smd-good { color: var(--accent); font-weight: 600; }
+.smd-ok { color: var(--orange); font-weight: 600; }
+.smd-bad { color: var(--danger); font-weight: 600; }
+
+.balance-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.balance-verdict.good { background: var(--accent-light); color: var(--accent-hover); border: 1px solid #b7dfc4; }
+.balance-verdict.fair { background: var(--orange-light); color: var(--orange); border: 1px solid #f0d5b8; }
+.balance-verdict.poor { background: var(--danger-light); color: var(--danger); border: 1px solid #f0c0c4; }
+
+.algo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--blue-light);
+  color: var(--blue);
+  border: 1px solid #c3d5e8;
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
 </style>
 </head>
 <body>
 <div class="app">
   <header>
     <h1>🐭 Mouse <span>Randomizer</span></h1>
-    <p>Balanced group assignment for preclinical studies. Upload a CSV with Animal IDs, Sex, Weight, and BMD to get started. See <a href="https://github.com/KhoslaLab/mouse-randomizer?tab=readme-ov-file#usage" target="_blank">usage guide</a> for further details.</p>
+    <p>Reproducible covariate-adaptive randomization for preclinical studies. Implements minimization inspired by Pocock &amp; Simon (1975) or stratified block randomization. Upload a CSV with Animal IDs, Sex, Weight, and BMD to get started. See <a href="https://github.com/KhoslaLab/mouse-randomizer?tab=readme-ov-file#usage" target="_blank">usage guide</a> for details.</p>
   </header>
 
   <!-- Step 1: Upload -->
@@ -638,7 +750,7 @@ td.group-cell {
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       <p><strong>Click to browse</strong> or drag &amp; drop a CSV file</p>
       <p class="hint">Expected columns: Animal ID, Sex, Start Weight (g), Spine BMD</p>
-      <p class="hint">Already have some mice assigned? Include a "Group" column — unassigned rows will be filled in to maintain balance.</p>
+      <p class="hint">Optional: include a "Cage" column to check cage-balance. Include a "Group" column for partial pre-assignment.</p>
       <p class="hint"><a href="#" id="downloadTemplate" onclick="event.stopPropagation();">Download template CSV</a></p>
     </div>
     <input type="file" id="fileInput" accept=".csv,.tsv,.txt" style="display:none">
@@ -649,9 +761,10 @@ td.group-cell {
     </div>
     <div id="fileStats" class="stats-row hidden"></div>
     <div id="fileMsg" class="message error hidden"></div>
+    <div id="parseWarnMsg" class="message warn hidden"></div>
   </div>
 
-  <!-- Step 2: Configure Groups -->
+  <!-- Step 2: Configure -->
   <div id="configCard" class="card hidden">
     <div class="card-title"><span class="step">2</span> Configure Groups</div>
     <div class="group-controls">
@@ -666,22 +779,55 @@ td.group-cell {
       <label>Labels:</label>
       <div id="groupLabels" class="group-labels"></div>
     </div>
+    <div class="options-row">
+      <div class="option-group">
+        <label for="seedInput">Seed (optional):</label>
+        <input type="text" id="seedInput" placeholder="auto" title="Enter an integer for reproducible results">
+      </div>
+      <div class="option-group">
+        <label for="algoSelect">Method:</label>
+        <select id="algoSelect">
+          <option value="minimization">Minimization (Pocock–Simon inspired)</option>
+          <option value="stratified">Stratified block randomization</option>
+        </select>
+      </div>
+    </div>
+    <div class="options-row">
+      <label class="toggle" title="Use coded labels (A, B, C…) in the output CSV with a separate key, to support blinded studies">
+        <input type="checkbox" id="blindToggle">
+        <span class="track"></span>
+        Allocation concealment (blinded labels)
+      </label>
+    </div>
     <div id="preassignedMsg" class="message info hidden"></div>
+    <div id="labelMismatchMsg" class="message error hidden"></div>
+    <div id="cageMsg" class="message info hidden"></div>
+    <div id="feasibilityMsg" class="message warn hidden"></div>
     <div class="btn-group">
       <button id="randomizeBtn" class="btn btn-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
         Randomize Groups
       </button>
-      <button id="reRandomizeBtn" class="btn btn-secondary hidden">
-        ↻ Re-randomize
-      </button>
+      <button id="reRandomizeBtn" class="btn btn-secondary hidden">↻ Re-randomize</button>
     </div>
   </div>
 
   <!-- Step 3: Results -->
   <div id="resultsCard" class="card hidden">
-    <div class="card-title"><span class="step">3</span> Results</div>
+    <div class="card-title">
+      <span class="step">3</span> Results
+      <span id="algoBadge" class="algo-badge"></span>
+    </div>
     <div id="summaryGrid" class="summary-grid"></div>
+    <div id="balanceSection" class="balance-section">
+      <h4>Balance Assessment</h4>
+      <div id="smdTableContainer"></div>
+      <div id="balanceVerdict"></div>
+    </div>
+    <div id="cageBalanceSection" class="balance-section hidden">
+      <h4 id="cageBalanceHeading">Cage Distribution Check</h4>
+      <div id="cageBalanceContent"></div>
+    </div>
     <div id="seedDisplay" class="seed-display"></div>
     <div id="tableWrapper" class="table-wrapper" style="max-height: 420px; overflow-y: auto;"></div>
     <div class="btn-group">
@@ -689,500 +835,821 @@ td.group-cell {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download CSV
       </button>
+      <button id="downloadReportBtn" class="btn btn-secondary">📋 Randomization Report</button>
+      <button id="downloadKeyBtn" class="btn btn-secondary hidden">🔑 Blinding Key</button>
     </div>
   </div>
 </div>
 
 <script>
 // ─── State ──────────────────────────────────────────────
-let rawCSVText = '';
-let parsedData = [];      // array of objects with original columns
-let headers = [];         // original CSV headers
-let colMap = {};          // { id, sex, weight, bmd, group } → header name
-let numGroups = 2;
-let groupLabels = ['Vehicle', 'AP'];
-let results = null;       // assigned data
-let preassignedIndices = new Set();
-let lastSeed = 0;
+let rawCSVText = '', parsedData = [], headers = [], colMap = {};
+let numGroups = 2, groupLabels = ['Vehicle', 'AP'];
+let results = null, preassignedIndices = new Set();
+let lastSeed = 0, lastAlgorithm = '', blindingMap = null;
+let inputFileName = '', inputFileHash = '';
+let parseWarnings = [];
 
-// ─── CSV Parsing ────────────────────────────────────────
+// ─── Utility ────────────────────────────────────────────
+async function hashText(text) {
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function mean(a) { return a.length ? a.reduce((s,v)=>s+v,0)/a.length : 0; }
+function sdSample(a) {
+  if (a.length < 2) return 0;
+  const m = mean(a);
+  return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));
+}
+function pooledSD(groups) {
+  let num=0, den=0;
+  for (const g of groups) { if (g.length<2) continue; const m=mean(g); num+=g.reduce((s,v)=>s+(v-m)**2,0); den+=g.length-1; }
+  return den>0 ? Math.sqrt(num/den) : 1;
+}
+
+// ─── CSV Parsing (via Papa Parse) ────────────────────────
 function parseCSV(text) {
-  // Handle BOM
-  text = text.replace(/^\uFEFF/, '');
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) throw new Error('CSV must have a header row and at least one data row.');
+  parseWarnings = [];
 
-  const headerLine = lines[0];
-  const sep = headerLine.includes('\t') ? '\t' : ',';
-  headers = headerLine.split(sep).map(h => h.trim());
-
-  // Detect columns flexibly
-  colMap = {};
-  headers.forEach((h, i) => {
-    const hl = h.toLowerCase();
-    if (!colMap.id && (hl.includes('animal') || hl.includes('mouse') || hl === 'id' || hl === 'subject'))
-      colMap.id = h;
-    else if (!colMap.sex && (hl === 'sex' || hl === 'gender'))
-      colMap.sex = h;
-    else if (!colMap.weight && (hl.includes('weight') || hl.includes('mass') || hl.includes('bw')))
-      colMap.weight = h;
-    else if (!colMap.bmd && (hl.includes('bmd') || hl.includes('bone mineral') || hl.includes('spine') || hl.includes('dexa') || hl.includes('dxa')))
-      colMap.bmd = h;
-    else if (!colMap.group && (hl === 'group' || hl === 'treatment' || hl === 'assignment'))
-      colMap.group = h;
+  const result = Papa.parse(text.replace(/^\uFEFF/,''), {
+    header: true,
+    skipEmptyLines: 'greedy',
+    dynamicTyping: false,
+    transformHeader: h => h.trim()
   });
 
+  // Collect non-fatal parser diagnostics
+  if (result.errors.length > 0) {
+    for (const e of result.errors) {
+      if (e.type === 'Quotes' || (e.type === 'FieldMismatch' && result.data.length === 0)) {
+        throw new Error(`CSV parse error (row ${e.row+2}): ${e.message}`);
+      }
+      // Surface non-fatal issues as warnings
+      parseWarnings.push(`Row ${e.row+2}: ${e.message} (${e.type})`);
+    }
+  }
+
+  // Report detected delimiter if not comma
+  if (result.meta.delimiter && result.meta.delimiter !== ',') {
+    parseWarnings.push(`Detected delimiter: "${result.meta.delimiter === '\t' ? 'tab' : result.meta.delimiter}" (not comma)`);
+  }
+
+  // Report if truncated
+  if (result.meta.truncated) {
+    parseWarnings.push('File was truncated during parsing — it may be incomplete.');
+  }
+
+  headers = result.meta.fields.filter(h => h);
+  if (result.data.length < 1) throw new Error('CSV must have a header row and at least one data row.');
+
+  colMap = {};
+  headers.forEach(h => {
+    const hl = h.toLowerCase();
+    if (!colMap.id && (hl.includes('animal')||hl.includes('mouse')||hl==='id'||hl==='subject')) colMap.id=h;
+    else if (!colMap.sex && (hl==='sex'||hl==='gender')) colMap.sex=h;
+    else if (!colMap.weight && (hl.includes('weight')||hl.includes('mass')||hl.includes('bw'))) colMap.weight=h;
+    else if (!colMap.bmd && (hl.includes('bmd')||hl.includes('bone mineral')||hl.includes('spine')||hl.includes('dexa')||hl.includes('dxa'))) colMap.bmd=h;
+    else if (!colMap.group && (hl==='group'||hl==='treatment'||hl==='assignment')) colMap.group=h;
+    else if (!colMap.cage && (hl==='cage'||hl==='cage id'||hl==='cage_id'||hl==='housing')) colMap.cage=h;
+  });
   if (!colMap.id) throw new Error('Could not find an Animal ID column.');
   if (!colMap.sex) throw new Error('Could not find a Sex column.');
   if (!colMap.weight) throw new Error('Could not find a Weight column.');
   if (!colMap.bmd) throw new Error('Could not find a BMD column.');
 
+  // Valid sex values (case-insensitive)
+  const validMale = new Set(['male', 'm']);
+  const validFemale = new Set(['female', 'f']);
+
   const data = [];
-  for (let i = 1; i < lines.length; i++) {
-    const vals = lines[i].split(sep).map(v => v.trim());
-    if (vals.length < headers.length) continue;
-    const row = {};
-    headers.forEach((h, j) => row[h] = vals[j]);
-    // Validate numeric
-    const w = parseFloat(row[colMap.weight]);
-    const b = parseFloat(row[colMap.bmd]);
-    if (isNaN(w) || isNaN(b)) throw new Error(`Row ${i+1}: Weight or BMD is not a number.`);
+  const seenIDs = new Map(); // id → row number (1-indexed CSV row)
+
+  for (let i=0; i<result.data.length; i++) {
+    const row = result.data[i];
+    const csvRow = i + 2; // 1-indexed, accounting for header
+    // Skip rows where all values are empty
+    if (headers.every(h => !(row[h]||'').trim())) continue;
+
+    // Validate numeric fields
+    const w=parseFloat(row[colMap.weight]), b=parseFloat(row[colMap.bmd]);
+    if (isNaN(w)||isNaN(b)) throw new Error(`Row ${csvRow}: Weight or BMD is not a number.`);
+
+    // Validate sex
+    const rawSex = (row[colMap.sex]||'').trim().toLowerCase();
+    if (!validMale.has(rawSex) && !validFemale.has(rawSex)) {
+      throw new Error(`Row ${csvRow}: Sex value "${row[colMap.sex]}" is not recognized. Expected: "Male", "M", "Female", or "F" (case-insensitive).`);
+    }
+
+    // Check for duplicate animal IDs
+    const id = (row[colMap.id]||'').trim();
+    if (seenIDs.has(id)) {
+      throw new Error(`Duplicate Animal ID "${id}" found in rows ${seenIDs.get(id)} and ${csvRow}.`);
+    }
+    seenIDs.set(id, csvRow);
+
     data.push(row);
   }
-
-  if (data.length < 2) throw new Error('Need at least 2 mice to assign groups.');
-
-  // Detect pre-assigned groups
+  if (data.length<2) throw new Error('Need at least 2 mice to assign groups.');
   preassignedIndices = new Set();
-  if (colMap.group) {
-    data.forEach((row, idx) => {
-      const g = (row[colMap.group] || '').trim();
-      if (g) preassignedIndices.add(idx);
+  if (colMap.group) data.forEach((row,idx)=>{ if((row[colMap.group]||'').trim()) preassignedIndices.add(idx); });
+
+  // Auto-detect cage from animal ID format: [text][cageNumber].[mouseNumber](.[sub])
+  // e.g. VQ1.2 → cage 1, VQ10.1.1 → cage 10, VQ15.4.4 → cage 15
+  if (!colMap.cage && colMap.id) {
+    const cagePattern = /^[a-zA-Z]+(\d+)\.\d+/;
+    const cageValues = data.map(r => {
+      const m = (r[colMap.id]||'').trim().match(cagePattern);
+      return m ? m[1] : null;
     });
+    if (cageValues.every(v => v !== null)) {
+      const cageCol = '_InferredCage';
+      colMap.cage = cageCol;
+      colMap._cageInferred = true;
+      data.forEach((row, i) => row[cageCol] = cageValues[i]);
+    }
   }
 
   return data;
 }
 
-// ─── Randomization Algorithm ────────────────────────────
+// ─── PRNG: Mulberry32 ───────────────────────────────────
 function seededRandom(seed) {
-  // Mulberry32
   return function() {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    seed|=0; seed=seed+0x6D2B79F5|0;
+    let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
   };
 }
-
-function shuffleArray(arr, rng) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+function shuffleArray(arr,rng) {
+  const a=[...arr];
+  for (let i=a.length-1;i>0;i--) { const j=Math.floor(rng()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
   return a;
 }
 
-function randomize(data, nGroups, labels, seed) {
+// ═══════════════════════════════════════════════════════════
+// Covariate-Adaptive Minimization (inspired by Pocock & Simon)
+// ═══════════════════════════════════════════════════════════
+// Inspired by: Pocock SJ, Simon R. Sequential treatment assignment
+// with balancing for prognostic factors in the controlled clinical
+// trial. Biometrics. 1975;31(1):103-115.
+//
+// This implementation follows the general framework of Pocock–Simon
+// minimization but has not been formally validated against their
+// original formulation. For each unassigned subject (random order):
+//   1. Compute the marginal imbalance that would result from
+//      assigning it to each candidate group, separately for each
+//      balancing factor (sex, weight tercile, BMD tercile, total n).
+//   2. Sum the marginal ranges across factors per candidate group.
+//   3. The group(s) with the smallest total imbalance are preferred.
+//   4. A biased coin (p = 0.80) selects among preferred vs other groups.
+// ═══════════════════════════════════════════════════════════
+
+function minimizationRandomize(data, nGroups, labels, seed) {
   const rng = seededRandom(seed);
   const groupCol = colMap.group || 'Group';
 
-  // Compute z-scores over ALL mice for weight and BMD
-  const weights = data.map(r => parseFloat(r[colMap.weight]));
-  const bmds = data.map(r => parseFloat(r[colMap.bmd]));
+  // Tercile boundaries computed over ALL mice (not just unassigned)
+  function tercileBins(values) {
+    const sorted = [...values].sort((a,b)=>a-b);
+    const t1 = sorted[Math.floor(sorted.length/3)];
+    const t2 = sorted[Math.floor(2*sorted.length/3)];
+    return v => v<=t1 ? 0 : v<=t2 ? 1 : 2;
+  }
 
-  const meanW = weights.reduce((a,b) => a+b, 0) / weights.length;
-  const meanB = bmds.reduce((a,b) => a+b, 0) / bmds.length;
-  const sdW = Math.sqrt(weights.reduce((a,v) => a + (v-meanW)**2, 0) / weights.length) || 1;
-  const sdB = Math.sqrt(bmds.reduce((a,v) => a + (v-meanB)**2, 0) / bmds.length) || 1;
+  const weightBin = tercileBins(data.map(r=>parseFloat(r[colMap.weight])));
+  const bmdBin = tercileBins(data.map(r=>parseFloat(r[colMap.bmd])));
 
-  const zScores = data.map((_, i) => ((weights[i]-meanW)/sdW + (bmds[i]-meanB)/sdB) / 2);
+  function getFactors(row) {
+    return {
+      sex: (row[colMap.sex]||'').trim().toLowerCase().startsWith('m') ? 'M' : 'F',
+      wBin: weightBin(parseFloat(row[colMap.weight])),
+      bBin: bmdBin(parseFloat(row[colMap.bmd]))
+    };
+  }
 
-  // Initialize group tracking
-  const groupTrack = Array.from({length: nGroups}, () => ({
-    count: 0, males: 0, females: 0, zSum: 0
-  }));
+  // Factor count tables: factor → level → [count per group]
+  const fc = {
+    sex:  { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) },
+    wBin: { 0: Array(nGroups).fill(0), 1: Array(nGroups).fill(0), 2: Array(nGroups).fill(0) },
+    bBin: { 0: Array(nGroups).fill(0), 1: Array(nGroups).fill(0), 2: Array(nGroups).fill(0) }
+  };
+  const gCounts = Array(nGroups).fill(0);
 
-  // Clone data and assign group column
-  const result = data.map(r => ({...r}));
+  const result = data.map(r=>({...r}));
 
-  // Process pre-assigned mice first
+  // Seed pre-assigned mice into factor counts
   preassignedIndices.forEach(idx => {
-    const existingLabel = (result[idx][groupCol] || '').trim();
-    const gi = labels.indexOf(existingLabel);
-    if (gi >= 0) {
-      const sex = (result[idx][colMap.sex] || '').trim().toLowerCase();
-      groupTrack[gi].count++;
-      if (sex.startsWith('m')) groupTrack[gi].males++;
-      else groupTrack[gi].females++;
-      groupTrack[gi].zSum += zScores[idx];
+    const gi = labels.indexOf((result[idx][groupCol]||'').trim());
+    if (gi>=0) {
+      const f = getFactors(result[idx]);
+      fc.sex[f.sex][gi]++; fc.wBin[f.wBin][gi]++; fc.bBin[f.bBin][gi]++;
+      gCounts[gi]++;
     }
   });
 
-  // Collect unassigned mice, separate by sex
-  const unassigned = data.map((r, i) => ({index: i, z: zScores[i], sex: (r[colMap.sex] || '').trim().toLowerCase()}))
-                         .filter((_, i) => !preassignedIndices.has(i) || !labels.includes((result[i][groupCol] || '').trim()));
+  // Unassigned indices, randomly ordered
+  const unassigned = [];
+  data.forEach((r,i)=>{
+    if (!preassignedIndices.has(i) || !labels.includes((result[i][groupCol]||'').trim()))
+      unassigned.push(i);
+  });
+  const order = shuffleArray(unassigned, rng);
 
-  const males = unassigned.filter(m => m.sex.startsWith('m'));
-  const females = unassigned.filter(m => !m.sex.startsWith('m'));
+  const biasP = 0.80;
 
-  // Sort each sex by z-score, then assign via stratified block randomization
-  function assignGroup(mice) {
-    // Sort by z-score
-    mice.sort((a, b) => a.z - b.z);
+  for (const idx of order) {
+    const f = getFactors(data[idx]);
 
-    // Create blocks of nGroups and randomly assign within each block
-    for (let b = 0; b < mice.length; b += nGroups) {
-      const block = mice.slice(b, b + nGroups);
+    // Compute imbalance for each candidate group
+    const imb = Array(nGroups).fill(0);
+    for (let gi=0; gi<nGroups; gi++) {
+      for (const [fname, levels] of Object.entries(fc)) {
+        const lvl = f[fname];
+        const hyp = levels[lvl].map((c,g) => g===gi ? c+1 : c);
+        imb[gi] += Math.max(...hyp) - Math.min(...hyp);
+      }
+      // Total count balance
+      const hCounts = gCounts.map((c,g)=>g===gi?c+1:c);
+      imb[gi] += Math.max(...hCounts) - Math.min(...hCounts);
+    }
 
-      // Score each possible assignment: try to minimize imbalance
-      // For small blocks at the end, do greedy assignment
-      if (block.length === nGroups) {
-        // Full block: random permutation of group indices
-        const perm = shuffleArray(Array.from({length: nGroups}, (_, i) => i), rng);
-        // But pick the best of a few random permutations
-        let bestPerm = perm;
-        let bestImbalance = Infinity;
-        for (let attempt = 0; attempt < Math.min(20, nGroups * 5); attempt++) {
-          const tryPerm = shuffleArray(Array.from({length: nGroups}, (_, i) => i), rng);
-          let imbalance = 0;
-          for (let k = 0; k < block.length; k++) {
-            const gi = tryPerm[k];
-            const projZ = groupTrack[gi].zSum + block[k].z;
-            const projCount = groupTrack[gi].count + 1;
-            imbalance += Math.abs(projZ / projCount);
-          }
-          if (imbalance < bestImbalance) {
-            bestImbalance = imbalance;
-            bestPerm = tryPerm;
-          }
-        }
-        for (let k = 0; k < block.length; k++) {
-          const gi = bestPerm[k];
-          const m = block[k];
-          result[m.index][groupCol] = labels[gi];
-          groupTrack[gi].count++;
-          groupTrack[gi].zSum += m.z;
-          if (m.sex.startsWith('m')) groupTrack[gi].males++;
-          else groupTrack[gi].females++;
-        }
-      } else {
-        // Partial block at end: greedy assignment
-        const shuffled = shuffleArray(block, rng);
-        for (const m of shuffled) {
-          // Find group with best balance (fewest same-sex, then lowest z-sum)
-          let bestG = 0;
-          let bestScore = Infinity;
-          const isMale = m.sex.startsWith('m');
-          for (let gi = 0; gi < nGroups; gi++) {
-            const sexCount = isMale ? groupTrack[gi].males : groupTrack[gi].females;
-            const totalCount = groupTrack[gi].count;
-            const avgZ = totalCount > 0 ? groupTrack[gi].zSum / totalCount : 0;
-            const score = sexCount * 1000 + totalCount * 100 + Math.abs(avgZ + m.z);
-            if (score < bestScore) {
-              bestScore = score;
-              bestG = gi;
-            }
-          }
-          result[m.index][groupCol] = labels[bestG];
-          groupTrack[bestG].count++;
-          groupTrack[bestG].zSum += m.z;
-          if (isMale) groupTrack[bestG].males++;
-          else groupTrack[bestG].females++;
-        }
+    const minImb = Math.min(...imb);
+    const preferred = [];
+    for (let gi=0; gi<nGroups; gi++) if (imb[gi]===minImb) preferred.push(gi);
+
+    let chosen;
+    if (preferred.length === nGroups) {
+      chosen = preferred[Math.floor(rng()*preferred.length)];
+    } else if (rng() < biasP) {
+      chosen = preferred[Math.floor(rng()*preferred.length)];
+    } else {
+      chosen = Math.floor(rng()*nGroups);
+    }
+
+    result[idx][groupCol] = labels[chosen];
+    fc.sex[f.sex][chosen]++; fc.wBin[f.wBin][chosen]++; fc.bBin[f.bBin][chosen]++;
+    gCounts[chosen]++;
+  }
+
+  if (!headers.includes(groupCol)) headers = [...headers, groupCol];
+  if (!colMap.group) colMap.group = groupCol;
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Stratified Block Randomization
+// ═══════════════════════════════════════════════════════════
+function stratifiedBlockRandomize(data, nGroups, labels, seed) {
+  const rng = seededRandom(seed);
+  const groupCol = colMap.group || 'Group';
+  const result = data.map(r=>({...r}));
+
+  const unassigned = { M: [], F: [] };
+  data.forEach((r,i)=>{
+    if (!preassignedIndices.has(i) || !labels.includes((result[i][groupCol]||'').trim())) {
+      const sex = (r[colMap.sex]||'').trim().toLowerCase().startsWith('m') ? 'M' : 'F';
+      unassigned[sex].push(i);
+    }
+  });
+
+  for (const sex of ['M','F']) {
+    const indices = shuffleArray(unassigned[sex], rng);
+    for (let b=0; b<indices.length; b+=nGroups) {
+      const block = indices.slice(b, b+nGroups);
+      const perm = shuffleArray(Array.from({length:nGroups},(_,i)=>i), rng);
+      for (let k=0; k<block.length; k++) {
+        result[block[k]][groupCol] = labels[perm[k % nGroups]];
       }
     }
   }
 
-  assignGroup(males);
-  assignGroup(females);
-
-  // Make sure group column is in headers
-  if (!headers.includes(groupCol)) {
-    headers = [...headers, groupCol];
-  }
+  if (!headers.includes(groupCol)) headers = [...headers, groupCol];
   if (!colMap.group) colMap.group = groupCol;
-
   return result;
 }
 
+// ─── Balance Metrics ────────────────────────────────────
+function computeBalanceMetrics(data, labels) {
+  const groupCol = colMap.group;
+  const groups = labels.map(l => data.filter(r=>(r[groupCol]||'').trim()===l));
+  const metrics = {};
+
+  function isMale(r) { return (r[colMap.sex]||'').trim().toLowerCase().startsWith('m'); }
+
+  for (const [key,col] of [['weight',colMap.weight],['bmd',colMap.bmd]]) {
+    const gv = groups.map(g=>g.map(r=>parseFloat(r[col])));
+    const psd = pooledSD(gv);
+    const gm = gv.map(v=>mean(v)), gs = gv.map(v=>sdSample(v));
+    const gMin = gv.map(v=>v.length?Math.min(...v):null);
+    const gMax = gv.map(v=>v.length?Math.max(...v):null);
+    const smds = {};
+    for (let i=0;i<labels.length;i++) for (let j=i+1;j<labels.length;j++)
+      smds[`${labels[i]} vs ${labels[j]}`] = psd>0 ? Math.abs(gm[i]-gm[j])/psd : 0;
+
+    // Within-sex SMDs
+    const maleGroups = groups.map(g=>g.filter(isMale).map(r=>parseFloat(r[col])));
+    const femaleGroups = groups.map(g=>g.filter(r=>!isMale(r)).map(r=>parseFloat(r[col])));
+    const malePSD = pooledSD(maleGroups);
+    const femalePSD = pooledSD(femaleGroups);
+    const maleMeans = maleGroups.map(v=>mean(v));
+    const femaleMeans = femaleGroups.map(v=>mean(v));
+    const maleSMDs = {}, femaleSMDs = {};
+    for (let i=0;i<labels.length;i++) for (let j=i+1;j<labels.length;j++) {
+      const pk = `${labels[i]} vs ${labels[j]}`;
+      maleSMDs[pk] = malePSD>0 ? Math.abs(maleMeans[i]-maleMeans[j])/malePSD : 0;
+      femaleSMDs[pk] = femalePSD>0 ? Math.abs(femaleMeans[i]-femaleMeans[j])/femalePSD : 0;
+    }
+
+    metrics[key] = { smds, groupMeans:gm, groupSDs:gs, groupMins:gMin, groupMaxs:gMax,
+                     maleSMDs, femaleSMDs, maleMeans, femaleMeans };
+  }
+
+  const maleProps = groups.map(g=>g.length ? g.filter(isMale).length/g.length : 0);
+  const maleCounts = groups.map(g=>g.filter(isMale).length);
+  const femaleCounts = groups.map((g,i)=>g.length-maleCounts[i]);
+  metrics.sex = { maleProps, maleCounts, femaleCounts };
+
+  const allSMDs = [...Object.values(metrics.weight.smds),...Object.values(metrics.bmd.smds)];
+  const maxSMD = allSMDs.length ? Math.max(...allSMDs) : 0;
+  return { metrics, maxSMD, groups };
+}
+
+// ─── Cage Balance Check ─────────────────────────────────
+function checkCageBalance(data, labels) {
+  if (!colMap.cage) return null;
+  const groupCol = colMap.group;
+  const cages = {};
+  data.forEach(r=>{
+    const cage=(r[colMap.cage]||'').trim(), group=(r[groupCol]||'').trim();
+    if (!cage) return;
+    if (!cages[cage]) cages[cage]={};
+    cages[cage][group]=(cages[cage][group]||0)+1;
+  });
+  const warnings = [];
+  for (const [cage,groups] of Object.entries(cages)) {
+    const total = Object.values(groups).reduce((a,b)=>a+b,0);
+    if (total>=2 && Object.keys(groups).length===1) {
+      warnings.push(`Cage "${cage}" has ${total} mice all assigned to "${Object.keys(groups)[0]}"`);
+    }
+  }
+  return { cages, warnings };
+}
+
+// ─── Pre-assignment feasibility ─────────────────────────
+function checkFeasibility(data, nGroups, labels) {
+  if (preassignedIndices.size===0) return null;
+  const groupCol = colMap.group;
+  const target = Math.round(data.length/nGroups);
+  const pre = {}; labels.forEach(l=>pre[l]=0);
+  preassignedIndices.forEach(idx=>{
+    const g=(data[idx][groupCol]||'').trim();
+    if (labels.includes(g)) pre[g]++;
+  });
+  const warnings = [];
+  for (const [label,count] of Object.entries(pre)) {
+    if (count > target+1) warnings.push(`"${label}" already has ${count} pre-assigned mice (target ~${target}). Perfect balance may not be achievable.`);
+  }
+  return warnings.length>0 ? warnings : null;
+}
+
 // ─── UI Wiring ──────────────────────────────────────────
-const $ = id => document.getElementById(id);
+const $ = id=>document.getElementById(id);
+const uploadZone = $('uploadZone'), fileInput = $('fileInput');
 
-// Upload
-const uploadZone = $('uploadZone');
-const fileInput = $('fileInput');
+uploadZone.addEventListener('click',()=>fileInput.click());
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('dragover');});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('dragover');if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0]);});
+fileInput.addEventListener('change',()=>{if(fileInput.files.length)handleFile(fileInput.files[0]);});
 
-uploadZone.addEventListener('click', () => fileInput.click());
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
-
-$('clearFile').addEventListener('click', () => {
-  parsedData = [];
-  rawCSVText = '';
-  results = null;
-  fileInput.value = '';
-  $('uploadZone').classList.remove('hidden');
-  $('fileLoaded').classList.add('hidden');
-  $('fileStats').classList.add('hidden');
-  $('fileMsg').classList.add('hidden');
-  $('configCard').classList.add('hidden');
-  $('resultsCard').classList.add('hidden');
+$('clearFile').addEventListener('click',()=>{
+  parsedData=[]; rawCSVText=''; results=null; blindingMap=null; fileInput.value=''; parseWarnings=[];
+  $('uploadZone').classList.remove('hidden'); $('fileLoaded').classList.add('hidden');
+  $('fileStats').classList.add('hidden'); $('fileMsg').classList.add('hidden');
+  $('parseWarnMsg').classList.add('hidden');
+  $('configCard').classList.add('hidden'); $('resultsCard').classList.add('hidden');
   $('reRandomizeBtn').classList.add('hidden');
 });
 
-function handleFile(file) {
+async function handleFile(file) {
   const reader = new FileReader();
-  reader.onload = e => {
-    rawCSVText = e.target.result;
+  reader.onload = async e=>{
+    rawCSVText=e.target.result; inputFileName=file.name;
+    inputFileHash = await hashText(rawCSVText);
     try {
-      parsedData = parseCSV(rawCSVText);
-      $('fileMsg').classList.add('hidden');
-      $('uploadZone').classList.add('hidden');
-      $('fileLoaded').classList.remove('hidden');
-      $('fileName').textContent = file.name;
-      showStats();
-      $('configCard').classList.remove('hidden');
-      $('resultsCard').classList.add('hidden');
-      $('reRandomizeBtn').classList.add('hidden');
-      results = null;
+      parsedData=parseCSV(rawCSVText);
+      $('fileMsg').classList.add('hidden'); $('uploadZone').classList.add('hidden');
+      $('fileLoaded').classList.remove('hidden'); $('fileName').textContent=file.name;
 
-      // If there are pre-assigned groups, detect labels
-      if (preassignedIndices.size > 0) {
-        const existingLabels = [...new Set(
-          [...preassignedIndices].map(i => (parsedData[i][colMap.group] || '').trim()).filter(Boolean)
-        )];
-        if (existingLabels.length >= 2) {
-          numGroups = existingLabels.length;
-          groupLabels = existingLabels;
-          $('numGroupsDisplay').textContent = numGroups;
-        }
+      // Show parser diagnostics if any
+      const pwMsg = $('parseWarnMsg');
+      if (parseWarnings.length > 0) {
+        pwMsg.innerHTML = '<strong>Parser notes:</strong> ' + parseWarnings.join(' · ');
+        pwMsg.classList.remove('hidden');
+      } else {
+        pwMsg.classList.add('hidden');
       }
 
-      renderGroupLabels();
-      updatePreassignedMsg();
-    } catch (err) {
-      $('fileMsg').textContent = err.message;
-      $('fileMsg').classList.remove('hidden');
-      $('configCard').classList.add('hidden');
+      showStats(); $('configCard').classList.remove('hidden');
+      $('resultsCard').classList.add('hidden'); $('reRandomizeBtn').classList.add('hidden'); results=null;
+      if (preassignedIndices.size>0) {
+        const el=[...new Set([...preassignedIndices].map(i=>(parsedData[i][colMap.group]||'').trim()).filter(Boolean))];
+        if (el.length>=2) { numGroups=el.length; groupLabels=el; $('numGroupsDisplay').textContent=numGroups; }
+      }
+      renderGroupLabels(); updatePreassignedMsg(); updateCageMsg();
+    } catch(err) {
+      $('fileMsg').textContent=err.message; $('fileMsg').classList.remove('hidden');
+      $('parseWarnMsg').classList.add('hidden'); $('configCard').classList.add('hidden');
     }
   };
   reader.readAsText(file);
 }
 
 function showStats() {
-  const stats = $('fileStats');
-  const totalMice = parsedData.length;
-  const males = parsedData.filter(r => (r[colMap.sex] || '').trim().toLowerCase().startsWith('m')).length;
-  const females = totalMice - males;
-  const preN = preassignedIndices.size;
-
-  let html = `
-    <div class="stat-chip">Total: <span class="val">${totalMice}</span></div>
+  const s=$('fileStats'), n=parsedData.length;
+  const males=parsedData.filter(r=>(r[colMap.sex]||'').trim().toLowerCase().startsWith('m')).length;
+  const preN=preassignedIndices.size;
+  let h=`<div class="stat-chip">Total: <span class="val">${n}</span></div>
     <div class="stat-chip">Males: <span class="val">${males}</span></div>
-    <div class="stat-chip">Females: <span class="val">${females}</span></div>
-  `;
-  if (preN > 0) {
-    html += `<div class="stat-chip has-groups">Pre-assigned: <span class="val">${preN}</span></div>`;
-    html += `<div class="stat-chip">To assign: <span class="val">${totalMice - preN}</span></div>`;
-  }
-  stats.innerHTML = html;
-  stats.classList.remove('hidden');
+    <div class="stat-chip">Females: <span class="val">${n-males}</span></div>`;
+  if (colMap.cage) { const cages=new Set(parsedData.map(r=>(r[colMap.cage]||'').trim()).filter(Boolean)); h+=`<div class="stat-chip">Cages: <span class="val">${cages.size}</span></div>`; }
+  if (preN>0) { h+=`<div class="stat-chip has-groups">Pre-assigned: <span class="val">${preN}</span></div><div class="stat-chip">To assign: <span class="val">${n-preN}</span></div>`; }
+  s.innerHTML=h; s.classList.remove('hidden');
 }
 
-// Group config
-$('decGroups').addEventListener('click', () => {
-  if (numGroups > 2) {
-    numGroups--;
-    $('numGroupsDisplay').textContent = numGroups;
-    groupLabels = groupLabels.slice(0, numGroups);
-    renderGroupLabels();
-    updatePreassignedMsg();
-  }
+$('decGroups').addEventListener('click',()=>{
+  if(numGroups>2){numGroups--;$('numGroupsDisplay').textContent=numGroups;groupLabels=groupLabels.slice(0,numGroups);renderGroupLabels();updatePreassignedMsg();}
 });
-
-$('incGroups').addEventListener('click', () => {
-  if (numGroups < 8) {
-    numGroups++;
-    $('numGroupsDisplay').textContent = numGroups;
-    while (groupLabels.length < numGroups) groupLabels.push('Group ' + groupLabels.length);
-    renderGroupLabels();
-    updatePreassignedMsg();
-  }
+$('incGroups').addEventListener('click',()=>{
+  if(numGroups<8){numGroups++;$('numGroupsDisplay').textContent=numGroups;while(groupLabels.length<numGroups)groupLabels.push('Group '+groupLabels.length);renderGroupLabels();updatePreassignedMsg();}
 });
 
 function renderGroupLabels() {
-  const container = $('groupLabels');
-  while (groupLabels.length < numGroups) groupLabels.push('Group ' + (groupLabels.length + 1));
-  const canDelete = numGroups > 2;
-  container.innerHTML = groupLabels.slice(0, numGroups).map((label, i) =>
-    `<div class="group-label-input${canDelete ? ' can-delete' : ''}">
-      <div class="tag dot-${i % 8}"></div>
-      <input type="text" value="${label}" data-index="${i}" placeholder="Group ${i+1}">
-      <button class="delete-group" data-index="${i}" title="Remove group">&times;</button>
-    </div>`
+  const c=$('groupLabels');
+  while(groupLabels.length<numGroups) groupLabels.push('Group '+(groupLabels.length+1));
+  const canDel=numGroups>2;
+  c.innerHTML=groupLabels.slice(0,numGroups).map((l,i)=>
+    `<div class="group-label-input${canDel?' can-delete':''}"><div class="tag dot-${i%8}"></div><input type="text" value="${l}" data-index="${i}" placeholder="Group ${i+1}"><button class="delete-group" data-index="${i}" title="Remove group">&times;</button></div>`
   ).join('');
-
-  container.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('input', e => {
-      groupLabels[parseInt(e.target.dataset.index)] = e.target.value;
-    });
-  });
-
-  container.querySelectorAll('.delete-group').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const idx = parseInt(e.currentTarget.dataset.index);
-      groupLabels.splice(idx, 1);
-      numGroups--;
-      $('numGroupsDisplay').textContent = numGroups;
-      renderGroupLabels();
-      updatePreassignedMsg();
-    });
-  });
+  c.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{groupLabels[parseInt(e.target.dataset.index)]=e.target.value;}));
+  c.querySelectorAll('.delete-group').forEach(btn=>btn.addEventListener('click',e=>{
+    const idx=parseInt(e.currentTarget.dataset.index); groupLabels.splice(idx,1); numGroups--;
+    $('numGroupsDisplay').textContent=numGroups; renderGroupLabels(); updatePreassignedMsg();
+  }));
 }
 
 function updatePreassignedMsg() {
-  const msg = $('preassignedMsg');
-  if (preassignedIndices.size > 0) {
-    const newMice = parsedData.length - preassignedIndices.size;
-    msg.textContent = `${preassignedIndices.size} mice already have group assignments. The ${newMice} unassigned mice will be distributed to maintain overall balance.`;
+  const msg=$('preassignedMsg');
+  if (preassignedIndices.size>0) {
+    msg.textContent=`${preassignedIndices.size} mice already have group assignments. The ${parsedData.length-preassignedIndices.size} unassigned mice will be distributed to maintain overall balance.`;
     msg.classList.remove('hidden');
-  } else {
-    msg.classList.add('hidden');
-  }
+  } else msg.classList.add('hidden');
 }
 
-// Randomize
+function updateCageMsg() {
+  const msg=$('cageMsg');
+  if (colMap.cage && colMap._cageInferred) {
+    const cages = new Set(parsedData.map(r=>(r[colMap.cage]||'').trim()).filter(Boolean));
+    msg.textContent=`Cage numbers inferred from Animal IDs (${cages.size} cages detected). Cage distribution will be checked after randomization.`;
+    msg.classList.remove('hidden');
+  } else if (colMap.cage) {
+    msg.textContent='Cage column detected. Cage distribution will be checked after randomization to flag potential cage effects.';
+    msg.classList.remove('hidden');
+  } else msg.classList.add('hidden');
+}
+
 $('randomizeBtn').addEventListener('click', doRandomize);
 $('reRandomizeBtn').addEventListener('click', doRandomize);
 
 function doRandomize() {
-  const labels = groupLabels.slice(0, numGroups).map(l => l.trim() || 'Group');
-  // Check for duplicate labels
-  if (new Set(labels).size !== labels.length) {
-    alert('Group labels must be unique.');
-    return;
-  }
+  const labels = groupLabels.slice(0,numGroups).map(l=>l.trim()||'Group');
+  if (new Set(labels).size!==labels.length) { alert('Group labels must be unique.'); return; }
 
-  lastSeed = Date.now() ^ (Math.random() * 0xFFFFFFFF >>> 0);
-  results = randomize(parsedData, numGroups, labels, lastSeed);
+  // Seed
+  const sv=$('seedInput').value.trim();
+  if (sv!==''&&sv!=='auto') { const p=parseInt(sv); if(isNaN(p)){alert('Seed must be an integer or left blank.');return;} lastSeed=p; }
+  else lastSeed = Date.now()^(Math.random()*0xFFFFFFFF>>>0);
 
-  showResults(labels);
-  $('resultsCard').classList.remove('hidden');
-  $('reRandomizeBtn').classList.remove('hidden');
-  $('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Feasibility
+  const fw=checkFeasibility(parsedData,numGroups,labels);
+  const fm=$('feasibilityMsg');
+  if(fw){fm.textContent=fw.join(' ');fm.classList.remove('hidden');}else fm.classList.add('hidden');
+
+  // Label mismatch warning
+  const lmMsg=$('labelMismatchMsg');
+  if (preassignedIndices.size>0 && colMap.group) {
+    const preLabels=[...new Set([...preassignedIndices].map(i=>(parsedData[i][colMap.group]||'').trim()).filter(Boolean))];
+    const unmatched=preLabels.filter(l=>!labels.includes(l));
+    if (unmatched.length>0) {
+      lmMsg.textContent=`Warning: Pre-assigned group labels [${unmatched.join(', ')}] do not match any configured group labels [${labels.join(', ')}]. These mice will be treated as unassigned.`;
+      lmMsg.classList.remove('hidden');
+    } else lmMsg.classList.add('hidden');
+  } else lmMsg.classList.add('hidden');
+
+  // Algorithm
+  lastAlgorithm=$('algoSelect').value;
+  results = lastAlgorithm==='minimization'
+    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed)
+    : stratifiedBlockRandomize(parsedData,numGroups,labels,lastSeed);
+
+  // Blinding
+  const blind=$('blindToggle').checked;
+  if (blind) {
+    const codes='ABCDEFGH'.split('');
+    blindingMap={}; labels.forEach((l,i)=>blindingMap[l]=codes[i]);
+    const gc=colMap.group;
+    results=results.map(r=>{const row={...r};const o=(row[gc]||'').trim();if(blindingMap[o])row[gc]=blindingMap[o];return row;});
+  } else blindingMap=null;
+
+  const dLabels = blind ? labels.map((_,i)=>'ABCDEFGH'[i]) : labels;
+  showResults(dLabels, labels);
+  $('resultsCard').classList.remove('hidden'); $('reRandomizeBtn').classList.remove('hidden');
+  $('downloadKeyBtn').classList.toggle('hidden',!blind);
+  $('algoBadge').textContent = lastAlgorithm==='minimization' ? 'Minimization (Pocock–Simon inspired)' : 'Stratified Block';
+  $('resultsCard').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function showResults(labels) {
-  // Summary
-  const summaryGrid = $('summaryGrid');
-  const nGroups = labels.length;
+function showResults(displayLabels, origLabels) {
+  const gc=colMap.group;
 
-  summaryGrid.innerHTML = labels.map((label, gi) => {
-    const mice = results.filter(r => (r[colMap.group] || '').trim() === label);
-    const n = mice.length;
-    const malesMice = mice.filter(r => (r[colMap.sex] || '').trim().toLowerCase().startsWith('m'));
-    const femalesMice = mice.filter(r => !(r[colMap.sex] || '').trim().toLowerCase().startsWith('m'));
-    const avg = (arr, col) => arr.length ? (arr.map(r => parseFloat(r[col])).reduce((a,b) => a+b, 0) / arr.length) : null;
-    const fmtW = v => v !== null ? v.toFixed(1) : '-';
-    const fmtB = v => v !== null ? v.toFixed(4) : '-';
-
-    const allW = avg(mice, colMap.weight);
-    const allB = avg(mice, colMap.bmd);
-    const mW = avg(malesMice, colMap.weight);
-    const mB = avg(malesMice, colMap.bmd);
-    const fW = avg(femalesMice, colMap.weight);
-    const fB = avg(femalesMice, colMap.bmd);
-
+  // Summary cards
+  $('summaryGrid').innerHTML = displayLabels.map((label,gi)=>{
+    const mice=results.filter(r=>(r[gc]||'').trim()===label);
+    const n=mice.length;
+    const mM=mice.filter(r=>(r[colMap.sex]||'').trim().toLowerCase().startsWith('m'));
+    const fM=mice.filter(r=>!(r[colMap.sex]||'').trim().toLowerCase().startsWith('m'));
+    const avg=(a,c)=>a.length?mean(a.map(r=>parseFloat(r[c]))):null;
+    const sdc=(a,c)=>a.length>=2?sdSample(a.map(r=>parseFloat(r[c]))):null;
+    const mn=(a,c)=>a.length?Math.min(...a.map(r=>parseFloat(r[c]))):null;
+    const mx=(a,c)=>a.length?Math.max(...a.map(r=>parseFloat(r[c]))):null;
+    const fw=v=>v!==null?v.toFixed(1):'-', fb=v=>v!==null?v.toFixed(4):'-';
     return `<div class="summary-card">
-      <div class="group-name"><div class="dot dot-${gi % 8}"></div>${label}</div>
-      <div class="details">
-        n = <span>${n}</span> &nbsp;(♂ <span>${malesMice.length}</span> · ♀ <span>${femalesMice.length}</span>)
-      </div>
+      <div class="group-name"><div class="dot dot-${gi%8}"></div>${label}</div>
+      <div class="details">n = <span>${n}</span> &nbsp;(♂ <span>${mM.length}</span> · ♀ <span>${fM.length}</span>)</div>
       <table class="summary-table">
         <thead><tr><th></th><th>Weight (g)</th><th>BMD</th></tr></thead>
         <tbody>
-          <tr><td>All</td><td><span>${fmtW(allW)}</span></td><td><span>${fmtB(allB)}</span></td></tr>
-          <tr><td>♂</td><td><span>${fmtW(mW)}</span></td><td><span>${fmtB(mB)}</span></td></tr>
-          <tr><td>♀</td><td><span>${fmtW(fW)}</span></td><td><span>${fmtB(fB)}</span></td></tr>
+          <tr><td>All mean ± SD</td><td><span>${fw(avg(mice,colMap.weight))} ± ${fw(sdc(mice,colMap.weight))}</span></td><td><span>${fb(avg(mice,colMap.bmd))} ± ${fb(sdc(mice,colMap.bmd))}</span></td></tr>
+          <tr><td>All range</td><td><span>${fw(mn(mice,colMap.weight))}–${fw(mx(mice,colMap.weight))}</span></td><td><span>${fb(mn(mice,colMap.bmd))}–${fb(mx(mice,colMap.bmd))}</span></td></tr>
+          <tr style="border-top:1px solid var(--border)"><td>♂ mean ± SD (n=${mM.length})</td><td><span>${fw(avg(mM,colMap.weight))} ± ${fw(sdc(mM,colMap.weight))}</span></td><td><span>${fb(avg(mM,colMap.bmd))} ± ${fb(sdc(mM,colMap.bmd))}</span></td></tr>
+          <tr><td>♀ mean ± SD (n=${fM.length})</td><td><span>${fw(avg(fM,colMap.weight))} ± ${fw(sdc(fM,colMap.weight))}</span></td><td><span>${fb(avg(fM,colMap.bmd))} ± ${fb(sdc(fM,colMap.bmd))}</span></td></tr>
         </tbody>
       </table>
     </div>`;
   }).join('');
 
-  // Seed
-  $('seedDisplay').innerHTML = `Seed: <code>${lastSeed}</code>`;
+  // Balance metrics
+  const {metrics, maxSMD} = computeBalanceMetrics(results, displayLabels);
+  showBalanceMetrics(metrics, displayLabels, maxSMD);
 
-  // Table
-  const tableWrapper = $('tableWrapper');
-  const displayHeaders = headers.filter(h => h);
-  let tableHTML = '<table><thead><tr>';
-  displayHeaders.forEach(h => tableHTML += `<th>${h}</th>`);
-  tableHTML += '</tr></thead><tbody>';
+  // Cage balance
+  if (colMap.cage) {
+    const cb=checkCageBalance(results,displayLabels);
+    const cs=$('cageBalanceSection'), cc=$('cageBalanceContent');
+    const inferNote = colMap._cageInferred ? ' <span style="font-weight:400;font-size:0.78rem;color:var(--text-tertiary)">(inferred from Animal ID format)</span>' : '';
+    $('cageBalanceHeading').innerHTML = 'Cage Distribution Check' + inferNote;
+    if(cb){cs.classList.remove('hidden');
+      cc.innerHTML=cb.warnings.length>0
+        ? `<div class="message warn" style="margin-top:0">${cb.warnings.map(w=>'⚠️ '+w).join('<br>')}<br><br>Consider re-randomizing or manually swapping mice to avoid confounding cage effects with treatment.</div>`
+        : `<div class="message success" style="margin-top:0">✓ No cages have all mice assigned to a single group.</div>`;
+    }
+  } else $('cageBalanceSection').classList.add('hidden');
 
-  results.forEach((row, idx) => {
-    tableHTML += '<tr>';
-    displayHeaders.forEach(h => {
-      if (h === colMap.group) {
-        const label = (row[h] || '').trim();
-        const gi = labels.indexOf(label);
-        const isNew = !preassignedIndices.has(idx) || !([...preassignedIndices].includes(idx) && parsedData[idx][colMap.group]);
-        const wasPre = preassignedIndices.has(idx) && parsedData[idx][colMap.group] === label;
-        const cls = wasPre ? 'preassigned' : 'newly-assigned';
-        tableHTML += `<td class="group-cell"><span class="group-badge gc-${gi % 8} ${cls}">${label}</span></td>`;
-      } else {
-        tableHTML += `<td>${row[h] || ''}</td>`;
-      }
-    });
-    tableHTML += '</tr>';
+  $('seedDisplay').innerHTML=`Seed: <code>${lastSeed}</code> &nbsp;·&nbsp; PRNG: <code>Mulberry32</code>`;
+
+  // Assignment table
+  const tw=$('tableWrapper'), dh=headers.filter(h=>h);
+  let t='<table><thead><tr>'; dh.forEach(h=>t+=`<th>${h}</th>`); t+='</tr></thead><tbody>';
+  results.forEach((row,idx)=>{
+    t+='<tr>'; dh.forEach(h=>{
+      if(h===gc){
+        const l=(row[h]||'').trim(), gi=displayLabels.indexOf(l);
+        const wasPre=preassignedIndices.has(idx)&&parsedData[idx][colMap.group];
+        t+=`<td class="group-cell"><span class="group-badge gc-${gi%8} ${wasPre?'preassigned':'newly-assigned'}">${l}</span></td>`;
+      } else t+=`<td>${row[h]||''}</td>`;
+    }); t+='</tr>';
   });
-
-  tableHTML += '</tbody></table>';
-  tableWrapper.innerHTML = tableHTML;
+  tw.innerHTML=t+'</tbody></table>';
 }
 
-// Download
-$('downloadBtn').addEventListener('click', () => {
-  if (!results) return;
-  const displayHeaders = headers.filter(h => h);
-  let csv = displayHeaders.join(',') + '\n';
-  results.forEach(row => {
-    csv += displayHeaders.map(h => {
-      let val = row[h] || '';
-      if (val.includes(',') || val.includes('"')) val = '"' + val.replace(/"/g, '""') + '"';
-      return val;
-    }).join(',') + '\n';
+function showBalanceMetrics(metrics, labels, maxSMD) {
+  const pairs=[];
+  for(let i=0;i<labels.length;i++) for(let j=i+1;j<labels.length;j++) pairs.push([labels[i],labels[j]]);
+
+  let h='<table class="smd-table"><thead><tr><th>Covariate</th>';
+  pairs.forEach(([a,b])=>h+=`<th>${a} vs ${b}</th>`);
+  h+='</tr></thead><tbody>';
+
+  for (const [key,label] of [['weight','Weight'],['bmd','BMD']]) {
+    // Overall SMD row
+    h+=`<tr><td>${label} (SMD, overall)</td>`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].smds[`${a} vs ${b}`]||0;
+      h+=`<td class="${smd<0.1?'smd-good':smd<0.2?'smd-ok':'smd-bad'}">${smd.toFixed(3)}</td>`;
+    });
+    h+='</tr>';
+    // Male SMD row
+    h+=`<tr><td>&nbsp;&nbsp;♂ only (SMD)</td>`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].maleSMDs[`${a} vs ${b}`]||0;
+      h+=`<td class="${smd<0.1?'smd-good':smd<0.2?'smd-ok':'smd-bad'}">${smd.toFixed(3)}</td>`;
+    });
+    h+='</tr>';
+    // Female SMD row
+    h+=`<tr><td>&nbsp;&nbsp;♀ only (SMD)</td>`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].femaleSMDs[`${a} vs ${b}`]||0;
+      h+=`<td class="${smd<0.1?'smd-good':smd<0.2?'smd-ok':'smd-bad'}">${smd.toFixed(3)}</td>`;
+    });
+    h+='</tr>';
+  }
+
+  // Sex balance row — absolute difference in male proportion
+  h+='<tr><td>Sex (abs. diff in male prop.)</td>';
+  pairs.forEach(([a,b])=>{
+    const d=Math.abs(metrics.sex.maleProps[labels.indexOf(a)]-metrics.sex.maleProps[labels.indexOf(b)]);
+    h+=`<td class="${d<0.1?'smd-good':d<0.2?'smd-ok':'smd-bad'}">${d.toFixed(3)}</td>`;
   });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'randomized_groups.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  h+='</tr></tbody></table>';
+  $('smdTableContainer').innerHTML=h;
+
+  const v=$('balanceVerdict');
+  if(maxSMD<0.1) v.innerHTML='<span class="balance-verdict good">✓ All pairwise SMDs &lt; 0.1</span>';
+  else if(maxSMD<0.2) v.innerHTML='<span class="balance-verdict fair">⚠ Max SMD &lt; 0.2 — consider re-randomizing for tighter balance</span>';
+  else v.innerHTML='<span class="balance-verdict poor">✗ SMD ≥ 0.2 detected — re-randomize or adjust groups</span>';
+  v.innerHTML += '<div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:0.4rem;font-weight:400">Thresholds of 0.1 and 0.2 are conventional heuristics for assessing covariate balance, not formal significance tests. They should be interpreted in the context of your study design and sample size.</div>';
+}
+
+// ─── Downloads ──────────────────────────────────────────
+$('downloadBtn').addEventListener('click',()=>{
+  if(!results) return;
+  const dh=headers.filter(h=>h);
+  let csv=dh.join(',')+'\n';
+  results.forEach(row=>{csv+=dh.map(h=>{let v=row[h]||'';if(v.includes(',')||v.includes('"'))v='"'+v.replace(/"/g,'""')+'"';return v;}).join(',')+'\n';});
+  dl(csv,'text/csv','randomized_groups.csv');
 });
 
-// Init
+$('downloadKeyBtn').addEventListener('click',()=>{
+  if(!blindingMap) return;
+  let t='ALLOCATION CONCEALMENT KEY\n==========================\n';
+  t+=`Generated: ${new Date().toISOString()}\nSeed: ${lastSeed}\n\nCode → Treatment\n─────────────────\n`;
+  for (const [orig,code] of Object.entries(blindingMap)) t+=`  ${code}  →  ${orig}\n`;
+  t+='\nKeep this file secure. Do not share with study personnel until unblinding.\n';
+  dl(t,'text/plain','blinding_key.txt');
+});
+
+$('downloadReportBtn').addEventListener('click',()=>{
+  if(!results) return;
+  const dLabels = blindingMap ? Object.values(blindingMap) : groupLabels.slice(0,numGroups).map(l=>l.trim()||'Group');
+  const {metrics, maxSMD} = computeBalanceMetrics(results, dLabels);
+  const algoFull = lastAlgorithm==='minimization'
+    ? 'Covariate-adaptive minimization inspired by Pocock & Simon (1975)'
+    : 'Stratified Block Randomization (stratified by sex)';
+  const gc=colMap.group;
+  function isMale(r) { return (r[colMap.sex]||'').trim().toLowerCase().startsWith('m'); }
+
+  let r='';
+  r+='═══════════════════════════════════════════════════════════════\n';
+  r+='                    RANDOMIZATION REPORT\n';
+  r+='═══════════════════════════════════════════════════════════════\n\n';
+
+  r+='1. GENERAL INFORMATION\n';
+  r+='───────────────────────────────────────────────────────────────\n';
+  r+=`  Date/Time:           ${new Date().toISOString()}\n`;
+  r+=`  Software:            Mouse Randomizer v2.0\n`;
+  r+=`  CSV parser:          Papa Parse 5.4.1\n`;
+  r+=`  Algorithm:           ${algoFull}\n`;
+  if(lastAlgorithm==='minimization') {
+    r+=`  Biased-coin prob:    0.80\n`;
+    r+=`  Balancing factors:   Sex (categorical), Weight (tercile-binned),\n`;
+    r+=`                       BMD (tercile-binned), Group size\n`;
+  } else r+=`  Stratification:      Sex\n`;
+  r+=`  PRNG:                Mulberry32\n`;
+  r+=`  Seed:                ${lastSeed}\n`;
+  r+=`  Input file:          ${inputFileName}\n`;
+  r+=`  Input SHA-256:       ${inputFileHash}\n`;
+  r+=`  Blinding:            ${blindingMap?'Enabled (allocation concealment)':'Disabled'}\n`;
+  r+=`  Total animals:       ${results.length}\n`;
+  r+=`  Number of groups:    ${numGroups}\n`;
+  r+=`  Pre-assigned:        ${preassignedIndices.size}\n`;
+  r+=`  Newly assigned:      ${results.length-preassignedIndices.size}\n\n`;
+
+  r+='2. GROUP LABELS\n';
+  r+='───────────────────────────────────────────────────────────────\n';
+  dLabels.forEach((l,i)=>r+=`  Group ${i+1}: ${l}\n`);
+  r+='\n';
+
+  r+='3. GROUP SUMMARY STATISTICS\n';
+  r+='───────────────────────────────────────────────────────────────\n';
+  dLabels.forEach(label=>{
+    const mice=results.filter(r2=>(r2[gc]||'').trim()===label);
+    const maleM=mice.filter(isMale), femaleM=mice.filter(r2=>!isMale(r2));
+    const w=mice.map(r2=>parseFloat(r2[colMap.weight])), b=mice.map(r2=>parseFloat(r2[colMap.bmd]));
+    const mW=maleM.map(r2=>parseFloat(r2[colMap.weight])), mB=maleM.map(r2=>parseFloat(r2[colMap.bmd]));
+    const fW=femaleM.map(r2=>parseFloat(r2[colMap.weight])), fB=femaleM.map(r2=>parseFloat(r2[colMap.bmd]));
+    r+=`  ${label} (n=${mice.length}, ♂${maleM.length} ♀${femaleM.length}):\n`;
+    r+=`    All —  Weight: mean=${mean(w).toFixed(2)} SD=${sdSample(w).toFixed(2)} range=[${Math.min(...w).toFixed(1)}, ${Math.max(...w).toFixed(1)}]\n`;
+    r+=`           BMD:    mean=${mean(b).toFixed(5)} SD=${sdSample(b).toFixed(5)} range=[${Math.min(...b).toFixed(4)}, ${Math.max(...b).toFixed(4)}]\n`;
+    if(maleM.length>0) {
+      r+=`    ♂   —  Weight: mean=${mean(mW).toFixed(2)} SD=${sdSample(mW).toFixed(2)}\n`;
+      r+=`           BMD:    mean=${mean(mB).toFixed(5)} SD=${sdSample(mB).toFixed(5)}\n`;
+    }
+    if(femaleM.length>0) {
+      r+=`    ♀   —  Weight: mean=${mean(fW).toFixed(2)} SD=${sdSample(fW).toFixed(2)}\n`;
+      r+=`           BMD:    mean=${mean(fB).toFixed(5)} SD=${sdSample(fB).toFixed(5)}\n`;
+    }
+  });
+  r+='\n';
+
+  r+='4. BALANCE ASSESSMENT\n';
+  r+='───────────────────────────────────────────────────────────────\n';
+  const pairs=[];
+  for(let i=0;i<dLabels.length;i++) for(let j=i+1;j<dLabels.length;j++) pairs.push([dLabels[i],dLabels[j]]);
+  r+='  Pairwise Standardized Mean Differences (SMD):\n';
+  for (const [key,label] of [['weight','Weight'],['bmd','BMD']]) {
+    r+=`    ${label} (overall):\n`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].smds[`${a} vs ${b}`]||0;
+      r+=`      ${a} vs ${b}: ${smd.toFixed(4)} ${smd<0.1?'✓':smd<0.2?'~':'✗'}\n`;
+    });
+    r+=`    ${label} (♂ only):\n`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].maleSMDs[`${a} vs ${b}`]||0;
+      r+=`      ${a} vs ${b}: ${smd.toFixed(4)} ${smd<0.1?'✓':smd<0.2?'~':'✗'}\n`;
+    });
+    r+=`    ${label} (♀ only):\n`;
+    pairs.forEach(([a,b])=>{
+      const smd=metrics[key].femaleSMDs[`${a} vs ${b}`]||0;
+      r+=`      ${a} vs ${b}: ${smd.toFixed(4)} ${smd<0.1?'✓':smd<0.2?'~':'✗'}\n`;
+    });
+  }
+  r+='  Sex balance (absolute difference in male proportion):\n';
+  pairs.forEach(([a,b])=>{
+    const d=Math.abs(metrics.sex.maleProps[dLabels.indexOf(a)]-metrics.sex.maleProps[dLabels.indexOf(b)]);
+    r+=`    ${a} vs ${b}: ${d.toFixed(4)}\n`;
+  });
+  r+='  Male proportion per group:\n';
+  dLabels.forEach((l,i)=>r+=`    ${l}: ${(metrics.sex.maleProps[i]*100).toFixed(1)}%\n`);
+  const verdict=maxSMD<0.1?'all SMDs < 0.1':maxSMD<0.2?'max SMD < 0.2':'max SMD >= 0.2';
+  r+=`\n  Maximum pairwise SMD: ${maxSMD.toFixed(4)} (${verdict})\n`;
+  r+='  Note: Thresholds of 0.1 and 0.2 are conventional heuristics for assessing\n';
+  r+='  covariate balance, not formal significance tests. They should be interpreted\n';
+  r+='  in the context of your study design and sample size.\n\n';
+
+  if(colMap.cage){
+    const cb=checkCageBalance(results,dLabels);
+    r+='5. CAGE DISTRIBUTION\n';
+    r+='───────────────────────────────────────────────────────────────\n';
+    if(colMap._cageInferred) r+='  Source: Cage numbers inferred from Animal ID format ([text][cage].[mouse])\n';
+    else r+='  Source: Explicit Cage column in CSV\n';
+    if(cb&&cb.warnings.length>0) cb.warnings.forEach(w=>r+=`  WARNING: ${w}\n`);
+    else r+='  No cages with all mice in a single group.\n';
+    r+='\n';
+  }
+
+  const secN = colMap.cage ? 6 : 5;
+  r+=`${secN}. INDIVIDUAL ASSIGNMENTS\n`;
+  r+='───────────────────────────────────────────────────────────────\n';
+  const dh=headers.filter(h=>h);
+  const cw=dh.map(h=>Math.max(h.length,14));
+  r+='  '+dh.map((h,i)=>h.padEnd(cw[i])).join('  ')+'\n';
+  r+='  '+cw.map(w=>'─'.repeat(w)).join('  ')+'\n';
+  results.forEach(row=>r+='  '+dh.map((h,i)=>(row[h]||'').padEnd(cw[i])).join('  ')+'\n');
+
+  r+='\n═══════════════════════════════════════════════════════════════\n';
+  r+='  SUGGESTED METHODS STATEMENT\n';
+  r+='───────────────────────────────────────────────────────────────\n';
+  if(lastAlgorithm==='minimization'){
+    r+='  Mice were assigned to treatment groups using covariate-\n';
+    r+='  adaptive minimization inspired by the method of Pocock &\n';
+    r+='  Simon (1975), balancing on sex (categorical), body weight\n';
+    r+='  (continuous, tercile-binned), and spine BMD (continuous,\n';
+    r+='  tercile-binned) with a biased-coin probability of 0.80.\n';
+    r+='  Randomization was performed using Mouse Randomizer v2.0\n';
+    r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
+  } else {
+    r+='  Mice were assigned to treatment groups using stratified\n';
+    r+='  block randomization, stratified by sex. Randomization was\n';
+    r+='  performed using Mouse Randomizer v2.0 (Mulberry32 PRNG,\n';
+    r+=`  seed: ${lastSeed}).\n`;
+  }
+  r+='═══════════════════════════════════════════════════════════════\n';
+  dl(r,'text/plain','randomization_report.txt');
+});
+
+function dl(content,type,name) {
+  const blob=new Blob([content],{type:type+';charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
+}
+
 renderGroupLabels();
 
-// Template download
-$('downloadTemplate').addEventListener('click', e => {
+$('downloadTemplate').addEventListener('click',e=>{
   e.preventDefault();
-  const csv = 'Animal ID,Sex,Start Weight (g),Spine BMD\nMOUSE001,Female,,\nMOUSE002,Male,,\n';
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'mouse_template.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  dl('Animal ID,Sex,Start Weight (g),Spine BMD,Cage\nMOUSE001,Female,,,Cage1\nMOUSE002,Male,,,Cage1\n','text/csv','mouse_template.csv');
 });
 </script>
 </body>
