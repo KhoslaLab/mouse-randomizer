@@ -799,6 +799,13 @@ td.group-cell { font-family: var(--font); font-weight: 600; }
         Allocation concealment (blinded labels)
       </label>
     </div>
+    <div class="options-row">
+      <label class="toggle" title="Compute weight and BMD tercile boundaries separately for males and females, so bins capture within-sex variation rather than recapitulating sex differences">
+        <input type="checkbox" id="sexBinToggle" checked>
+        <span class="track"></span>
+        Sex-specific covariate binning
+      </label>
+    </div>
     <div id="preassignedMsg" class="message info hidden"></div>
     <div id="labelMismatchMsg" class="message error hidden"></div>
     <div id="cageMsg" class="message info hidden"></div>
@@ -849,6 +856,7 @@ let results = null, preassignedIndices = new Set();
 let lastSeed = 0, lastAlgorithm = '', blindingMap = null;
 let inputFileName = '', inputFileHash = '';
 let parseWarnings = [];
+let lastSexSpecificBins = true;
 
 // ─── Utility ────────────────────────────────────────────
 async function hashText(text) {
@@ -1004,39 +1012,69 @@ function shuffleArray(arr,rng) {
 //   2. Sum the marginal ranges across factors per candidate group.
 //   3. The group(s) with the smallest total imbalance are preferred.
 //   4. A biased coin (p = 0.80) selects among preferred vs other groups.
+//
+// When sex-specific binning is enabled, weight and BMD tercile
+// boundaries are computed separately for males and females. Factor
+// levels become sex-prefixed (e.g. M0, M1, M2, F0, F1, F2) so the
+// algorithm balances within-sex covariate distribution across groups
+// rather than balancing bins that mostly recapitulate sex.
 // ═══════════════════════════════════════════════════════════
 
-function minimizationRandomize(data, nGroups, labels, seed) {
+function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins) {
   const rng = seededRandom(seed);
   const groupCol = colMap.group || 'Group';
 
-  // Tercile boundaries computed over ALL mice (not just unassigned)
+  function isMale(row) {
+    return (row[colMap.sex]||'').trim().toLowerCase().startsWith('m');
+  }
+
+  // Tercile boundary helper
   function tercileBins(values) {
+    if (values.length < 3) return v => 0; // degenerate: all in one bin
     const sorted = [...values].sort((a,b)=>a-b);
     const t1 = sorted[Math.floor(sorted.length/3)];
     const t2 = sorted[Math.floor(2*sorted.length/3)];
     return v => v<=t1 ? 0 : v<=t2 ? 1 : 2;
   }
 
-  const weightBin = tercileBins(data.map(r=>parseFloat(r[colMap.weight])));
-  const bmdBin = tercileBins(data.map(r=>parseFloat(r[colMap.bmd])));
+  // Build bin functions: either pooled or sex-specific
+  let weightBinFn, bmdBinFn;
+  if (sexSpecificBins) {
+    const maleRows = data.filter(isMale), femaleRows = data.filter(r=>!isMale(r));
+    const mWeightBin = tercileBins(maleRows.map(r=>parseFloat(r[colMap.weight])));
+    const fWeightBin = tercileBins(femaleRows.map(r=>parseFloat(r[colMap.weight])));
+    const mBmdBin = tercileBins(maleRows.map(r=>parseFloat(r[colMap.bmd])));
+    const fBmdBin = tercileBins(femaleRows.map(r=>parseFloat(r[colMap.bmd])));
+    weightBinFn = (val, male) => (male ? 'M' : 'F') + (male ? mWeightBin(val) : fWeightBin(val));
+    bmdBinFn = (val, male) => (male ? 'M' : 'F') + (male ? mBmdBin(val) : fBmdBin(val));
+  } else {
+    const pooledWeightBin = tercileBins(data.map(r=>parseFloat(r[colMap.weight])));
+    const pooledBmdBin = tercileBins(data.map(r=>parseFloat(r[colMap.bmd])));
+    weightBinFn = (val, _male) => '' + pooledWeightBin(val);
+    bmdBinFn = (val, _male) => '' + pooledBmdBin(val);
+  }
 
   function getFactors(row) {
+    const male = isMale(row);
     return {
-      sex: (row[colMap.sex]||'').trim().toLowerCase().startsWith('m') ? 'M' : 'F',
-      wBin: weightBin(parseFloat(row[colMap.weight])),
-      bBin: bmdBin(parseFloat(row[colMap.bmd]))
+      sex: male ? 'M' : 'F',
+      wBin: weightBinFn(parseFloat(row[colMap.weight]), male),
+      bBin: bmdBinFn(parseFloat(row[colMap.bmd]), male)
     };
   }
 
-  // Factor count tables: factor → level → [count per group]
+  // Build factor count tables dynamically from possible levels
+  const wLevels = sexSpecificBins ? ['M0','M1','M2','F0','F1','F2'] : ['0','1','2'];
+  const bLevels = sexSpecificBins ? ['M0','M1','M2','F0','F1','F2'] : ['0','1','2'];
+
   const fc = {
     sex:  { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) },
-    wBin: { 0: Array(nGroups).fill(0), 1: Array(nGroups).fill(0), 2: Array(nGroups).fill(0) },
-    bBin: { 0: Array(nGroups).fill(0), 1: Array(nGroups).fill(0), 2: Array(nGroups).fill(0) }
+    wBin: {}, bBin: {}
   };
-  const gCounts = Array(nGroups).fill(0);
+  wLevels.forEach(l => fc.wBin[l] = Array(nGroups).fill(0));
+  bLevels.forEach(l => fc.bBin[l] = Array(nGroups).fill(0));
 
+  const gCounts = Array(nGroups).fill(0);
   const result = data.map(r=>({...r}));
 
   // Seed pre-assigned mice into factor counts
@@ -1173,7 +1211,14 @@ function computeBalanceMetrics(data, labels) {
 
   const allSMDs = [...Object.values(metrics.weight.smds),...Object.values(metrics.bmd.smds)];
   const maxSMD = allSMDs.length ? Math.max(...allSMDs) : 0;
-  return { metrics, maxSMD, groups };
+
+  const withinSexSMDs = [
+    ...Object.values(metrics.weight.maleSMDs),...Object.values(metrics.weight.femaleSMDs),
+    ...Object.values(metrics.bmd.maleSMDs),...Object.values(metrics.bmd.femaleSMDs)
+  ];
+  const maxWithinSexSMD = withinSexSMDs.length ? Math.max(...withinSexSMDs) : 0;
+
+  return { metrics, maxSMD, maxWithinSexSMD, groups };
 }
 
 // ─── Cage Balance Check ─────────────────────────────────
@@ -1350,8 +1395,9 @@ function doRandomize() {
 
   // Algorithm
   lastAlgorithm=$('algoSelect').value;
+  lastSexSpecificBins=$('sexBinToggle').checked;
   results = lastAlgorithm==='minimization'
-    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed)
+    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed,lastSexSpecificBins)
     : stratifiedBlockRandomize(parsedData,numGroups,labels,lastSeed);
 
   // Blinding
@@ -1401,8 +1447,8 @@ function showResults(displayLabels, origLabels) {
   }).join('');
 
   // Balance metrics
-  const {metrics, maxSMD} = computeBalanceMetrics(results, displayLabels);
-  showBalanceMetrics(metrics, displayLabels, maxSMD);
+  const {metrics, maxSMD, maxWithinSexSMD} = computeBalanceMetrics(results, displayLabels);
+  showBalanceMetrics(metrics, displayLabels, maxSMD, maxWithinSexSMD);
 
   // Cage balance
   if (colMap.cage) {
@@ -1434,7 +1480,7 @@ function showResults(displayLabels, origLabels) {
   tw.innerHTML=t+'</tbody></table>';
 }
 
-function showBalanceMetrics(metrics, labels, maxSMD) {
+function showBalanceMetrics(metrics, labels, maxSMD, maxWithinSexSMD) {
   const pairs=[];
   for(let i=0;i<labels.length;i++) for(let j=i+1;j<labels.length;j++) pairs.push([labels[i],labels[j]]);
 
@@ -1479,6 +1525,14 @@ function showBalanceMetrics(metrics, labels, maxSMD) {
   if(maxSMD<0.1) v.innerHTML='<span class="balance-verdict good">✓ All pairwise SMDs &lt; 0.1</span>';
   else if(maxSMD<0.2) v.innerHTML='<span class="balance-verdict fair">⚠ Max SMD &lt; 0.2 — consider re-randomizing for tighter balance</span>';
   else v.innerHTML='<span class="balance-verdict poor">✗ SMD ≥ 0.2 detected — re-randomize or adjust groups</span>';
+
+  // Within-sex advisory
+  if (maxWithinSexSMD >= 0.2) {
+    v.innerHTML += '<div style="font-size:0.8rem;color:var(--orange);margin-top:0.5rem;font-weight:500">⚠ Within-sex SMD ≥ 0.2 detected. If your analysis will stratify or interact by sex, review the ♂/♀ rows above and consider re-randomizing.</div>';
+  } else if (maxWithinSexSMD >= 0.1 && maxSMD < 0.1) {
+    v.innerHTML += '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;font-weight:400">Note: Overall SMDs are below 0.1, but some within-sex SMDs are between 0.1–0.2. Review the ♂/♀ rows if your analysis will stratify by sex.</div>';
+  }
+
   v.innerHTML += '<div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:0.4rem;font-weight:400">Thresholds of 0.1 and 0.2 are conventional heuristics for assessing covariate balance, not formal significance tests. They should be interpreted in the context of your study design and sample size.</div>';
 }
 
@@ -1503,7 +1557,7 @@ $('downloadKeyBtn').addEventListener('click',()=>{
 $('downloadReportBtn').addEventListener('click',()=>{
   if(!results) return;
   const dLabels = blindingMap ? Object.values(blindingMap) : groupLabels.slice(0,numGroups).map(l=>l.trim()||'Group');
-  const {metrics, maxSMD} = computeBalanceMetrics(results, dLabels);
+  const {metrics, maxSMD, maxWithinSexSMD} = computeBalanceMetrics(results, dLabels);
   const algoFull = lastAlgorithm==='minimization'
     ? 'Covariate-adaptive minimization inspired by Pocock & Simon (1975)'
     : 'Stratified Block Randomization (stratified by sex)';
@@ -1518,13 +1572,14 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='1. GENERAL INFORMATION\n';
   r+='───────────────────────────────────────────────────────────────\n';
   r+=`  Date/Time:           ${new Date().toISOString()}\n`;
-  r+=`  Software:            Mouse Randomizer v2.0\n`;
+  r+=`  Software:            Mouse Randomizer v2.1\n`;
   r+=`  CSV parser:          Papa Parse 5.4.1\n`;
   r+=`  Algorithm:           ${algoFull}\n`;
   if(lastAlgorithm==='minimization') {
     r+=`  Biased-coin prob:    0.80\n`;
     r+=`  Balancing factors:   Sex (categorical), Weight (tercile-binned),\n`;
     r+=`                       BMD (tercile-binned), Group size\n`;
+    r+=`  Covariate binning:   ${lastSexSpecificBins ? 'Sex-specific (separate terciles per sex)' : 'Pooled (terciles across all mice)'}\n`;
   } else r+=`  Stratification:      Sex\n`;
   r+=`  PRNG:                Mulberry32\n`;
   r+=`  Seed:                ${lastSeed}\n`;
@@ -1593,7 +1648,11 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='  Male proportion per group:\n';
   dLabels.forEach((l,i)=>r+=`    ${l}: ${(metrics.sex.maleProps[i]*100).toFixed(1)}%\n`);
   const verdict=maxSMD<0.1?'all SMDs < 0.1':maxSMD<0.2?'max SMD < 0.2':'max SMD >= 0.2';
-  r+=`\n  Maximum pairwise SMD: ${maxSMD.toFixed(4)} (${verdict})\n`;
+  r+=`\n  Maximum pairwise SMD (overall): ${maxSMD.toFixed(4)} (${verdict})\n`;
+  r+=`  Maximum pairwise SMD (within-sex): ${maxWithinSexSMD.toFixed(4)}\n`;
+  if (maxWithinSexSMD >= 0.2) {
+    r+='  ** Within-sex SMD >= 0.2 — review ♂/♀ rows if analysis will stratify by sex.\n';
+  }
   r+='  Note: Thresholds of 0.1 and 0.2 are conventional heuristics for assessing\n';
   r+='  covariate balance, not formal significance tests. They should be interpreted\n';
   r+='  in the context of your study design and sample size.\n\n';
@@ -1622,17 +1681,24 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='  SUGGESTED METHODS STATEMENT\n';
   r+='───────────────────────────────────────────────────────────────\n';
   if(lastAlgorithm==='minimization'){
+    const binDesc = lastSexSpecificBins ? 'sex-specific tercile-binned' : 'tercile-binned';
     r+='  Mice were assigned to treatment groups using covariate-\n';
     r+='  adaptive minimization inspired by the method of Pocock &\n';
-    r+='  Simon (1975), balancing on sex (categorical), body weight\n';
-    r+='  (continuous, tercile-binned), and spine BMD (continuous,\n';
-    r+='  tercile-binned) with a biased-coin probability of 0.80.\n';
-    r+='  Randomization was performed using Mouse Randomizer v2.0\n';
+    r+=`  Simon (1975), balancing on sex (categorical), body weight\n`;
+    r+=`  (continuous, ${binDesc}), and spine BMD (continuous,\n`;
+    r+=`  ${binDesc}) with a biased-coin probability of 0.80.\n`;
+    if (lastSexSpecificBins) {
+      r+='  Tercile boundaries for weight and BMD were computed\n';
+      r+='  separately within each sex. ';
+    } else {
+      r+='  ';
+    }
+    r+='Randomization was performed using Mouse Randomizer v2.1\n';
     r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
   } else {
     r+='  Mice were assigned to treatment groups using stratified\n';
     r+='  block randomization, stratified by sex. Randomization was\n';
-    r+='  performed using Mouse Randomizer v2.0 (Mulberry32 PRNG,\n';
+    r+='  performed using Mouse Randomizer v2.1 (Mulberry32 PRNG,\n';
     r+=`  seed: ${lastSeed}).\n`;
   }
   r+='═══════════════════════════════════════════════════════════════\n';
