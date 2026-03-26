@@ -842,6 +842,7 @@ td.group-cell { font-family: var(--font); font-weight: 600; }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download CSV
       </button>
+      <button id="copyStatsBtn" class="btn btn-secondary">📊 Copy Statistics</button>
       <button id="downloadReportBtn" class="btn btn-secondary">📋 Randomization Report</button>
       <button id="downloadKeyBtn" class="btn btn-secondary hidden">🔑 Blinding Key</button>
     </div>
@@ -1543,6 +1544,57 @@ $('downloadBtn').addEventListener('click',()=>{
   let csv=dh.join(',')+'\n';
   results.forEach(row=>{csv+=dh.map(h=>{let v=row[h]||'';if(v.includes(',')||v.includes('"'))v='"'+v.replace(/"/g,'""')+'"';return v;}).join(',')+'\n';});
   dl(csv,'text/csv',datePrefix()+'_randomized_groups.csv');
+});
+
+$('copyStatsBtn').addEventListener('click',()=>{
+  if(!results) return;
+  const dLabels = blindingMap ? Object.values(blindingMap) : groupLabels.slice(0,numGroups).map(l=>l.trim()||'Group');
+  const gc=colMap.group;
+  const {metrics, maxSMD, maxWithinSexSMD} = computeBalanceMetrics(results, dLabels);
+  function isMale(r) { return (r[colMap.sex]||'').trim().toLowerCase().startsWith('m'); }
+  const fw=v=>v!==null?v.toFixed(1):'-', fb=v=>v!==null?v.toFixed(4):'-';
+  const avg=(a,c)=>a.length?mean(a.map(r=>parseFloat(r[c]))):null;
+  const sdc=(a,c)=>a.length>=2?sdSample(a.map(r=>parseFloat(r[c]))):null;
+  const mn=(a,c)=>a.length?Math.min(...a.map(r=>parseFloat(r[c]))):null;
+  const mx=(a,c)=>a.length?Math.max(...a.map(r=>parseFloat(r[c]))):null;
+
+  let t='';
+
+  // Per-group summaries
+  dLabels.forEach(label=>{
+    const mice=results.filter(r=>(r[gc]||'').trim()===label);
+    const mM=mice.filter(isMale), fM=mice.filter(r=>!isMale(r));
+    t+=`${label}\n`;
+    t+=`n = ${mice.length}  (♂ ${mM.length} · ♀ ${fM.length})\n`;
+    t+=`\tWeight (g)\tBMD\n`;
+    t+=`All mean ± SD\t${fw(avg(mice,colMap.weight))} ± ${fw(sdc(mice,colMap.weight))}\t${fb(avg(mice,colMap.bmd))} ± ${fb(sdc(mice,colMap.bmd))}\n`;
+    t+=`All range\t${fw(mn(mice,colMap.weight))}–${fw(mx(mice,colMap.weight))}\t${fb(mn(mice,colMap.bmd))}–${fb(mx(mice,colMap.bmd))}\n`;
+    t+=`♂ mean ± SD (n=${mM.length})\t${fw(avg(mM,colMap.weight))} ± ${fw(sdc(mM,colMap.weight))}\t${fb(avg(mM,colMap.bmd))} ± ${fb(sdc(mM,colMap.bmd))}\n`;
+    t+=`♀ mean ± SD (n=${fM.length})\t${fw(avg(fM,colMap.weight))} ± ${fw(sdc(fM,colMap.weight))}\t${fb(avg(fM,colMap.bmd))} ± ${fb(sdc(fM,colMap.bmd))}\n`;
+  });
+
+  // Balance assessment
+  const pairs=[];
+  for(let i=0;i<dLabels.length;i++) for(let j=i+1;j<dLabels.length;j++) pairs.push([dLabels[i],dLabels[j]]);
+  const pairHeader=pairs.map(([a,b])=>`${a} vs ${b}`).join('\t');
+
+  t+=`Balance Assessment\n`;
+  t+=`Covariate\t${pairHeader}\n`;
+
+  for (const [key,label] of [['weight','Weight'],['bmd','BMD']]) {
+    t+=`${label} (SMD, overall)\t${pairs.map(([a,b])=>(metrics[key].smds[`${a} vs ${b}`]||0).toFixed(3)).join('\t')}\n`;
+    t+=`  ♂ only (SMD)\t${pairs.map(([a,b])=>(metrics[key].maleSMDs[`${a} vs ${b}`]||0).toFixed(3)).join('\t')}\n`;
+    t+=`  ♀ only (SMD)\t${pairs.map(([a,b])=>(metrics[key].femaleSMDs[`${a} vs ${b}`]||0).toFixed(3)).join('\t')}\n`;
+  }
+
+  t+=`Sex (abs. diff in male prop.)\t${pairs.map(([a,b])=>Math.abs(metrics.sex.maleProps[dLabels.indexOf(a)]-metrics.sex.maleProps[dLabels.indexOf(b)]).toFixed(3)).join('\t')}\n`;
+
+  navigator.clipboard.writeText(t).then(()=>{
+    const btn=$('copyStatsBtn');
+    const orig=btn.textContent;
+    btn.textContent='✓ Copied';
+    setTimeout(()=>btn.textContent=orig, 1500);
+  });
 });
 
 $('downloadKeyBtn').addEventListener('click',()=>{
