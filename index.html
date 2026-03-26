@@ -1542,7 +1542,7 @@ $('downloadBtn').addEventListener('click',()=>{
   const dh=headers.filter(h=>h);
   let csv=dh.join(',')+'\n';
   results.forEach(row=>{csv+=dh.map(h=>{let v=row[h]||'';if(v.includes(',')||v.includes('"'))v='"'+v.replace(/"/g,'""')+'"';return v;}).join(',')+'\n';});
-  dl(csv,'text/csv','randomized_groups.csv');
+  dl(csv,'text/csv',datePrefix()+'_randomized_groups.csv');
 });
 
 $('downloadKeyBtn').addEventListener('click',()=>{
@@ -1551,7 +1551,7 @@ $('downloadKeyBtn').addEventListener('click',()=>{
   t+=`Generated: ${new Date().toISOString()}\nSeed: ${lastSeed}\n\nCode → Treatment\n─────────────────\n`;
   for (const [orig,code] of Object.entries(blindingMap)) t+=`  ${code}  →  ${orig}\n`;
   t+='\nKeep this file secure. Do not share with study personnel until unblinding.\n';
-  dl(t,'text/plain','blinding_key.txt');
+  dl(t,'text/plain',datePrefix()+'_blinding_key.txt');
 });
 
 $('downloadReportBtn').addEventListener('click',()=>{
@@ -1573,6 +1573,7 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='───────────────────────────────────────────────────────────────\n';
   r+=`  Date/Time:           ${new Date().toISOString()}\n`;
   r+=`  Software:            Mouse Randomizer v2.1\n`;
+  r+=`  Website:             https://khoslalab.github.io/mouse-randomizer/\n`;
   r+=`  CSV parser:          Papa Parse 5.4.1\n`;
   r+=`  Algorithm:           ${algoFull}\n`;
   if(lastAlgorithm==='minimization') {
@@ -1702,8 +1703,13 @@ $('downloadReportBtn').addEventListener('click',()=>{
     r+=`  seed: ${lastSeed}).\n`;
   }
   r+='═══════════════════════════════════════════════════════════════\n';
-  dl(r,'text/plain','randomization_report.txt');
+  dl(r,'text/plain',datePrefix()+'_randomization_report.txt');
 });
+
+function datePrefix() {
+  const d=new Date(), y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}${m}${day}`;
+}
 
 function dl(content,type,name) {
   const blob=new Blob([content],{type:type+';charset=utf-8;'});
