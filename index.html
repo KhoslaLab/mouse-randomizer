@@ -867,13 +867,7 @@ td.group-cell { font-family: var(--font); font-weight: 600; }
         Allocation concealment (blinded labels)
       </label>
     </div>
-    <div class="options-row">
-      <label class="toggle" title="Compute weight and BMD tercile boundaries separately for males and females, so bins capture within-sex variation rather than recapitulating sex differences">
-        <input type="checkbox" id="sexBinToggle" checked>
-        <span class="track"></span>
-        Sex-specific covariate binning
-      </label>
-    </div>
+
     <div id="preassignedMsg" class="message info hidden"></div>
     <div id="labelMismatchMsg" class="message error hidden"></div>
     <div id="cageMsg" class="message info hidden"></div>
@@ -925,7 +919,6 @@ let results = null, preassignedIndices = new Set();
 let lastSeed = 0, lastAlgorithm = '', blindingMap = null;
 let inputFileName = '', inputFileHash = '';
 let parseWarnings = [];
-let lastSexSpecificBins = true;
 let lastWeights = [1, 1];
 
 // ─── Utility ────────────────────────────────────────────
@@ -1076,26 +1069,39 @@ function shuffleArray(arr,rng) {
 // This implementation follows the general framework of Pocock–Simon
 // minimization but has not been formally validated against their
 // original formulation. For each unassigned subject (random order):
-//   1. Compute the marginal imbalance that would result from
-//      assigning it to each candidate group, separately for each
-//      balancing factor (sex, weight tercile, BMD tercile, total n).
-//   2. Sum the marginal ranges across factors per candidate group.
+//   1. Compute the imbalance that would result from assigning it to
+//      each candidate group, using:
+//      - Sex: range of normalized counts (categorical)
+//      - Weight: within-sex SSD of group means, SD-standardized
+//      - BMD: within-sex SSD of group means, SD-standardized
+//      - Group size: range of normalized counts
+//   2. Sum the imbalance across factors per candidate group.
 //   3. The group(s) with the smallest total imbalance are preferred.
 //   4. A biased coin (p = 0.80) selects among preferred vs other groups.
 //
-// Unequal allocation is supported via allocation weights. When
-// weights differ, factor counts and group sizes are normalized by
-// allocation proportion before computing the range, so the algorithm
-// targets the specified ratio (e.g. 2:1) instead of equal groups.
+// Continuous covariates (weight, BMD) are balanced directly on their
+// within-sex group means rather than being discretized into tercile
+// bins. This preserves all information in the covariates and directly
+// optimizes the quantity measured by the standardized mean difference.
+// Within-sex balancing prevents a scenario where overall means look
+// balanced but heavy males are concentrated in one group while light
+// males compensate by pairing with heavy females.
 //
-// When sex-specific binning is enabled, weight and BMD tercile
-// boundaries are computed separately for males and females. Factor
-// levels become sex-prefixed (e.g. M0, M1, M2, F0, F1, F2) so the
-// algorithm balances within-sex covariate distribution across groups
-// rather than balancing bins that mostly recapitulate sex.
+// Imbalance for continuous covariates is measured as the sum of
+// squared deviations (SSD) of group means from the grand mean,
+// standardized by the within-sex variance:
+//   SSD = Σ_k (x̄_k − x̄)² / s²
+// SSD uses information from all groups (not just the extremes) and
+// produces smoother optimization than a range-based metric,
+// especially with 3+ groups.
+//
+// Unequal allocation is supported via allocation weights. When
+// weights differ, factor counts are normalized by allocation
+// proportion before computing the range, so the algorithm targets
+// the specified ratio (e.g. 2:1) instead of equal groups.
 // ═══════════════════════════════════════════════════════════
 
-function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins, weights) {
+function minimizationRandomize(data, nGroups, labels, seed, weights) {
   const rng = seededRandom(seed);
   const groupCol = colMap.group || 'Group';
   // Normalize weights to proportions
@@ -1106,61 +1112,29 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins, wei
     return (row[colMap.sex]||'').trim().toLowerCase().startsWith('m');
   }
 
-  // Tercile boundary helper
-  function tercileBins(values) {
-    if (values.length < 3) return v => 0; // degenerate: all in one bin
-    const sorted = [...values].sort((a,b)=>a-b);
-    const t1 = sorted[Math.floor(sorted.length/3)];
-    const t2 = sorted[Math.floor(2*sorted.length/3)];
-    return v => v<=t1 ? 0 : v<=t2 ? 1 : 2;
-  }
+  // Compute within-sex SDs for standardization
+  const maleRows = data.filter(isMale);
+  const femaleRows = data.filter(r => !isMale(r));
+  const mWeightSD = sdSample(maleRows.map(r=>parseFloat(r[colMap.weight]))) || 1;
+  const fWeightSD = sdSample(femaleRows.map(r=>parseFloat(r[colMap.weight]))) || 1;
+  const mBmdSD = sdSample(maleRows.map(r=>parseFloat(r[colMap.bmd]))) || 1;
+  const fBmdSD = sdSample(femaleRows.map(r=>parseFloat(r[colMap.bmd]))) || 1;
 
-  // Build bin functions: either pooled or sex-specific
-  let weightBinFn, bmdBinFn;
-  if (sexSpecificBins) {
-    const maleRows = data.filter(isMale), femaleRows = data.filter(r=>!isMale(r));
-    const mWeightBin = tercileBins(maleRows.map(r=>parseFloat(r[colMap.weight])));
-    const fWeightBin = tercileBins(femaleRows.map(r=>parseFloat(r[colMap.weight])));
-    const mBmdBin = tercileBins(maleRows.map(r=>parseFloat(r[colMap.bmd])));
-    const fBmdBin = tercileBins(femaleRows.map(r=>parseFloat(r[colMap.bmd])));
-    weightBinFn = (val, male) => (male ? 'M' : 'F') + (male ? mWeightBin(val) : fWeightBin(val));
-    bmdBinFn = (val, male) => (male ? 'M' : 'F') + (male ? mBmdBin(val) : fBmdBin(val));
-  } else {
-    const pooledWeightBin = tercileBins(data.map(r=>parseFloat(r[colMap.weight])));
-    const pooledBmdBin = tercileBins(data.map(r=>parseFloat(r[colMap.bmd])));
-    weightBinFn = (val, _male) => '' + pooledWeightBin(val);
-    bmdBinFn = (val, _male) => '' + pooledBmdBin(val);
-  }
-
-  function getFactors(row) {
-    const male = isMale(row);
-    return {
-      sex: male ? 'M' : 'F',
-      wBin: weightBinFn(parseFloat(row[colMap.weight]), male),
-      bBin: bmdBinFn(parseFloat(row[colMap.bmd]), male)
-    };
-  }
-
-  // Build factor count tables dynamically from possible levels
-  const wLevels = sexSpecificBins ? ['M0','M1','M2','F0','F1','F2'] : ['0','1','2'];
-  const bLevels = sexSpecificBins ? ['M0','M1','M2','F0','F1','F2'] : ['0','1','2'];
-
-  const fc = {
-    sex:  { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) },
-    wBin: {}, bBin: {}
-  };
-  wLevels.forEach(l => fc.wBin[l] = Array(nGroups).fill(0));
-  bLevels.forEach(l => fc.bBin[l] = Array(nGroups).fill(0));
-
+  // Running state per group, tracked separately by sex
+  const sexCounts = { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) };
+  const wSums = { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) };
+  const bSums = { M: Array(nGroups).fill(0), F: Array(nGroups).fill(0) };
   const gCounts = Array(nGroups).fill(0);
   const result = data.map(r=>({...r}));
 
-  // Seed pre-assigned mice into factor counts
+  // Seed pre-assigned mice into running state
   preassignedIndices.forEach(idx => {
     const gi = labels.indexOf((result[idx][groupCol]||'').trim());
     if (gi>=0) {
-      const f = getFactors(result[idx]);
-      fc.sex[f.sex][gi]++; fc.wBin[f.wBin][gi]++; fc.bBin[f.bBin][gi]++;
+      const sex = isMale(result[idx]) ? 'M' : 'F';
+      sexCounts[sex][gi]++;
+      wSums[sex][gi] += parseFloat(result[idx][colMap.weight]);
+      bSums[sex][gi] += parseFloat(result[idx][colMap.bmd]);
       gCounts[gi]++;
     }
   });
@@ -1175,28 +1149,61 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins, wei
 
   const biasP = 0.80;
 
-  // Weighted imbalance: normalize counts by allocation proportion,
-  // then compute range. This reduces to the original max-min when
-  // all weights are equal.
-  function weightedRange(counts) {
+  // Weighted range for categorical/count factors: normalize by
+  // allocation proportion, then compute range.
+  function weightedCountRange(counts) {
     const norm = counts.map((c,g) => c / wProps[g]);
     return Math.max(...norm) - Math.min(...norm);
   }
 
-  for (const idx of order) {
-    const f = getFactors(data[idx]);
+  // SSD of group means from grand mean, standardized by variance.
+  // sums/counts are for one sex. candidateVal is added to candidateGroup.
+  // Returns Σ_k (x̄_k − x̄)² / sd² for all non-empty groups.
+  function continuousSSD(sums, counts, candidateVal, candidateGroup, sd) {
+    const means = [];
+    let totalSum = 0, totalN = 0;
+    for (let g = 0; g < nGroups; g++) {
+      const s = g === candidateGroup ? sums[g] + candidateVal : sums[g];
+      const n = g === candidateGroup ? counts[g] + 1 : counts[g];
+      if (n === 0) { means.push(null); continue; }
+      const m = s / n;
+      means.push(m);
+      totalSum += s;
+      totalN += n;
+    }
+    const valid = means.filter(m => m !== null);
+    if (valid.length < 2) return 0;
+    const grandMean = totalSum / totalN;
+    let ssd = 0;
+    for (const m of valid) ssd += (m - grandMean) ** 2;
+    return ssd / (sd * sd);
+  }
 
-    // Compute imbalance for each candidate group
+  for (const idx of order) {
+    const row = data[idx];
+    const sex = isMale(row) ? 'M' : 'F';
+    const w = parseFloat(row[colMap.weight]);
+    const b = parseFloat(row[colMap.bmd]);
+    const thisWeightSD = sex === 'M' ? mWeightSD : fWeightSD;
+    const thisBmdSD = sex === 'M' ? mBmdSD : fBmdSD;
+
+    // Only the mouse's own sex changes per candidate group;
+    // the other sex's contribution is constant and cancels out.
     const imb = Array(nGroups).fill(0);
-    for (let gi=0; gi<nGroups; gi++) {
-      for (const [fname, levels] of Object.entries(fc)) {
-        const lvl = f[fname];
-        const hyp = levels[lvl].map((c,g) => g===gi ? c+1 : c);
-        imb[gi] += weightedRange(hyp);
-      }
+    for (let gi = 0; gi < nGroups; gi++) {
+      // Sex balance (categorical)
+      const hypSex = sexCounts[sex].map((c,g) => g===gi ? c+1 : c);
+      imb[gi] += weightedCountRange(hypSex);
+
+      // Within-sex weight balance (continuous, SSD)
+      imb[gi] += continuousSSD(wSums[sex], sexCounts[sex], w, gi, thisWeightSD);
+
+      // Within-sex BMD balance (continuous, SSD)
+      imb[gi] += continuousSSD(bSums[sex], sexCounts[sex], b, gi, thisBmdSD);
+
       // Total count balance
       const hCounts = gCounts.map((c,g)=>g===gi?c+1:c);
-      imb[gi] += weightedRange(hCounts);
+      imb[gi] += weightedCountRange(hCounts);
     }
 
     const minImb = Math.min(...imb);
@@ -1213,7 +1220,9 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins, wei
     }
 
     result[idx][groupCol] = labels[chosen];
-    fc.sex[f.sex][chosen]++; fc.wBin[f.wBin][chosen]++; fc.bBin[f.bBin][chosen]++;
+    sexCounts[sex][chosen]++;
+    wSums[sex][chosen] += w;
+    bSums[sex][chosen] += b;
     gCounts[chosen]++;
   }
 
@@ -1512,10 +1521,9 @@ function doRandomize() {
 
   // Algorithm
   lastAlgorithm=$('algoSelect').value;
-  lastSexSpecificBins=$('sexBinToggle').checked;
   lastWeights = weights;
   results = lastAlgorithm==='minimization'
-    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed,lastSexSpecificBins,weights)
+    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed,weights)
     : stratifiedBlockRandomize(parsedData,numGroups,labels,lastSeed,weights);
 
   // Blinding
@@ -1749,15 +1757,18 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='1. GENERAL INFORMATION\n';
   r+='───────────────────────────────────────────────────────────────\n';
   r+=`  Date/Time:           ${new Date().toISOString()}\n`;
-  r+=`  Software:            Mouse Randomizer v2.2\n`;
+  r+=`  Software:            Mouse Randomizer v2.3\n`;
   r+=`  Website:             https://khoslalab.github.io/mouse-randomizer/\n`;
   r+=`  CSV parser:          Papa Parse 5.4.1\n`;
   r+=`  Algorithm:           ${algoFull}\n`;
   if(lastAlgorithm==='minimization') {
     r+=`  Biased-coin prob:    0.80\n`;
-    r+=`  Balancing factors:   Sex (categorical), Weight (tercile-binned),\n`;
-    r+=`                       BMD (tercile-binned), Group size\n`;
-    r+=`  Covariate binning:   ${lastSexSpecificBins ? 'Sex-specific (separate terciles per sex)' : 'Pooled (terciles across all mice)'}\n`;
+    r+=`  Balancing factors:   Sex (categorical), Weight (continuous,\n`;
+    r+=`                       within-sex SSD, SD-standardized),\n`;
+    r+=`                       BMD (continuous, within-sex SSD,\n`;
+    r+=`                       SD-standardized), Group size\n`;
+    r+=`  Imbalance metric:    Sum of squared deviations of group\n`;
+    r+=`                       means from grand mean (within-sex)\n`;
   } else r+=`  Stratification:      Sex\n`;
   r+=`  PRNG:                Mulberry32\n`;
   r+=`  Seed:                ${lastSeed}\n`;
@@ -1867,27 +1878,21 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='  SUGGESTED METHODS STATEMENT\n';
   r+='───────────────────────────────────────────────────────────────\n';
   if(lastAlgorithm==='minimization'){
-    const binDesc = lastSexSpecificBins ? 'sex-specific tercile-binned' : 'tercile-binned';
     const ratioDesc = rptIsWeighted ? ` with a ${rptWeights.join(':')} allocation ratio` : '';
     r+='  Mice were assigned to treatment groups using covariate-\n';
     r+='  adaptive minimization inspired by the method of Pocock &\n';
     r+=`  Simon (1975)${ratioDesc}, balancing on sex (categorical),\n`;
-    r+=`  body weight (continuous, ${binDesc}), and spine BMD\n`;
-    r+=`  (continuous, ${binDesc}) with a biased-coin probability\n`;
-    r+='  of 0.80.\n';
-    if (lastSexSpecificBins) {
-      r+='  Tercile boundaries for weight and BMD were computed\n';
-      r+='  separately within each sex. ';
-    } else {
-      r+='  ';
-    }
-    r+='Randomization was performed using Mouse Randomizer v2.2\n';
-    r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
+    r+='  body weight (continuous), and spine BMD (continuous), with\n';
+    r+='  a biased-coin probability of 0.80. Continuous covariates\n';
+    r+='  were balanced within sex using the sum of squared deviations\n';
+    r+='  of group means from the grand mean, standardized by the\n';
+    r+='  within-sex standard deviation. Randomization was performed\n';
+    r+=`  using Mouse Randomizer v2.3 (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
   } else {
     const ratioDesc = rptIsWeighted ? ` with a ${rptWeights.join(':')} allocation ratio` : '';
     r+='  Mice were assigned to treatment groups using stratified\n';
     r+=`  block randomization${ratioDesc}, stratified by sex.\n`;
-    r+='  Randomization was performed using Mouse Randomizer v2.2\n';
+    r+='  Randomization was performed using Mouse Randomizer v2.3\n';
     r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
   }
   r+='═══════════════════════════════════════════════════════════════\n';

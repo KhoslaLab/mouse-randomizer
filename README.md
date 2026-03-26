@@ -11,16 +11,20 @@ groups while balancing on sex, weight, and BMD.
 
 - **Covariate-adaptive minimization** — The default algorithm is inspired
   by Pocock & Simon (1975). Each mouse is sequentially assigned to the
-  group that minimizes marginal imbalance across sex, weight
-  (tercile-binned), BMD (tercile-binned), and group size, with a
-  biased-coin probability (p = 0.80) to preserve randomness. Each
-  covariate is balanced independently so one cannot mask another.
-- **Sex-specific covariate binning** — On by default. When enabled, weight
-  and BMD tercile boundaries are computed separately for males and
-  females. This ensures the bins capture within-sex variation (e.g. light
-  vs. heavy males) rather than mostly recapitulating the sex difference
-  itself. Can be toggled off for studies where male–female baselines are
-  similar.
+  group that minimizes imbalance across sex, weight, BMD, and group size,
+  with a biased-coin probability (p = 0.80) to preserve randomness.
+  Continuous covariates (weight, BMD) are balanced directly on their
+  within-sex group means — no binning or discretization — so the algorithm
+  optimizes the same quantity measured by the standardized mean difference
+  (SMD). Imbalance is measured as the sum of squared deviations of group
+  means from the grand mean (SSD), standardized by within-sex SD. This
+  uses information from all groups (not just the two extremes) and produces
+  smoother optimization than a range-based metric, especially with 3+
+  groups.
+- **Within-sex covariate balancing** — Weight and BMD are balanced
+  separately within males and females. This prevents a scenario where
+  balanced overall means mask within-sex imbalance (e.g., heavy males
+  concentrated in one group, compensated by heavy females in another).
 - **Stratified block randomization** — Also available as a simpler
   alternative when only sex balance is needed. Mice are stratified by sex
   and assigned in random permutation blocks.
@@ -107,9 +111,6 @@ app to get a blank one with the correct headers.
 - Optionally enter a seed for reproducibility, or leave blank for
   automatic seed generation.
 - Toggle **Allocation concealment** if you need blinded group codes.
-- **Sex-specific covariate binning** is on by default. It computes
-  separate weight/BMD tercile boundaries per sex. Turn it off if male and
-  female baselines are similar in your study.
 - If your CSV includes a "Group" column with some mice already assigned,
   the app detects them automatically. You'll be warned if pre-assigned
   labels don't match your configured group labels.
@@ -144,31 +145,39 @@ the method described by Pocock and Simon (1975). Note that this
 implementation has not been formally validated against their original
 formulation.
 
-1. Tercile boundaries are computed for weight and BMD across all mice
-   (including any pre-assigned). When **sex-specific binning** is enabled
-   (the default), boundaries are computed separately within males and
-   females, and factor levels become sex-prefixed (e.g., M0/M1/M2 for male
-   terciles, F0/F1/F2 for female terciles). This prevents pooled bins from
-   merely recapitulating sex when baseline values differ between sexes.
+1. Within-sex standard deviations are computed for weight and BMD across
+   all mice (including any pre-assigned). These are used to standardize
+   the continuous imbalance terms so that weight and BMD contribute on a
+   comparable scale regardless of their units.
 2. Mice are processed in random order. For each mouse, the app computes
-   the marginal imbalance that would result from assigning it to each
-   candidate group, separately for each balancing factor:
-    - Sex (categorical: M/F)
-    - Weight tercile (low/mid/high)
-    - BMD tercile (low/mid/high)
-    - Total group size
-3. For each factor, imbalance is measured as the range (max − min) of
-   counts across groups for the relevant factor level. When unequal
-   allocation ratios are specified, counts are normalized by each group's
-   target proportion before computing the range, so the algorithm targets
-   the specified ratio (e.g., 2:1) rather than equal group sizes.
-4. The total imbalance for each candidate group is the sum of ranges
-   across all factors.
-5. The group(s) with the lowest total imbalance are preferred. A biased
+   the imbalance that would result from assigning it to each candidate
+   group, across four balancing factors:
+    - **Sex** (categorical): range of allocation-normalized counts across
+      groups for the mouse's sex level.
+    - **Weight** (continuous, within-sex): sum of squared deviations (SSD)
+      of within-sex group means from the within-sex grand mean, divided by
+      the within-sex variance.
+    - **BMD** (continuous, within-sex): same SSD metric as weight,
+      computed within the mouse's sex.
+    - **Group size**: range of allocation-normalized total counts.
+3. For continuous covariates, only the mouse's own sex stratum is
+   evaluated — the other sex's contribution is constant across candidate
+   groups and cancels out. This ensures the algorithm balances weight and
+   BMD within males and within females independently, preventing a
+   scenario where balanced overall means mask within-sex imbalance.
+4. The SSD metric uses information from all groups (not just the two
+   extremes), producing smoother optimization than the range, especially
+   with 3+ groups. With 2 groups the two metrics are equivalent.
+5. When unequal allocation ratios are specified, counts are normalized by
+   each group's target proportion before computing the range, so the
+   algorithm targets the specified ratio (e.g., 2:1) rather than equal
+   group sizes.
+6. The total imbalance for each candidate group is the sum across all
+   factors. The group(s) with the lowest total are preferred. A biased
    coin (p = 0.80) assigns to a preferred group; with probability 0.20, a
    group is chosen uniformly at random.
-6. Pre-assigned mice are accounted for in the running factor counts before
-   any new assignments.
+7. Pre-assigned mice are accounted for in the running state (sex counts,
+   weight sums, BMD sums per sex per group) before any new assignments.
 
 ### Stratified block randomization
 
