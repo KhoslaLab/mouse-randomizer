@@ -343,6 +343,70 @@ header p a:hover { color: var(--accent-hover); }
 
 .group-label-input.can-delete .delete-group { display: flex; }
 
+.group-ratio-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.group-ratio-row label {
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ratio-inputs { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+
+.ratio-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.ratio-input-wrap .tag {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.ratio-input-wrap input {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  width: 44px;
+  text-align: center;
+  transition: border-color 0.15s;
+}
+
+.ratio-input-wrap input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+}
+
+.ratio-sep {
+  font-weight: 600;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.ratio-summary {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  margin-left: 0.25rem;
+  font-family: var(--mono);
+}
+
 .btn {
   font-family: var(--font);
   font-size: 0.9rem;
@@ -779,6 +843,10 @@ td.group-cell { font-family: var(--font); font-weight: 600; }
       <label>Labels:</label>
       <div id="groupLabels" class="group-labels"></div>
     </div>
+    <div class="group-ratio-row">
+      <label>Allocation ratio:</label>
+      <div id="ratioInputs" class="ratio-inputs"></div>
+    </div>
     <div class="options-row">
       <div class="option-group">
         <label for="seedInput">Seed (optional):</label>
@@ -852,12 +920,13 @@ td.group-cell { font-family: var(--font); font-weight: 600; }
 <script>
 // ─── State ──────────────────────────────────────────────
 let rawCSVText = '', parsedData = [], headers = [], colMap = {};
-let numGroups = 2, groupLabels = ['Vehicle', 'AP'];
+let numGroups = 2, groupLabels = ['Vehicle', 'AP'], groupWeights = [1, 1];
 let results = null, preassignedIndices = new Set();
 let lastSeed = 0, lastAlgorithm = '', blindingMap = null;
 let inputFileName = '', inputFileHash = '';
 let parseWarnings = [];
 let lastSexSpecificBins = true;
+let lastWeights = [1, 1];
 
 // ─── Utility ────────────────────────────────────────────
 async function hashText(text) {
@@ -963,10 +1032,10 @@ function parseCSV(text) {
   preassignedIndices = new Set();
   if (colMap.group) data.forEach((row,idx)=>{ if((row[colMap.group]||'').trim()) preassignedIndices.add(idx); });
 
-  // Auto-detect cage from animal ID format: [text][cageNumber].[mouseNumber](.[sub])
-  // e.g. VQ1.2 → cage 1, VQ10.1.1 → cage 10, VQ15.4.4 → cage 15
+  // Auto-detect cage from animal ID format: [text][cageNumber].[mouseID]
+  // e.g. VQ1.2 → cage 1, VQ10.1.1 → cage 10, VQ16.L1 → cage 16
   if (!colMap.cage && colMap.id) {
-    const cagePattern = /^[a-zA-Z]+(\d+)\.\d+/;
+    const cagePattern = /^[a-zA-Z]+(\d+)\.[a-zA-Z0-9]+/;
     const cageValues = data.map(r => {
       const m = (r[colMap.id]||'').trim().match(cagePattern);
       return m ? m[1] : null;
@@ -1014,6 +1083,11 @@ function shuffleArray(arr,rng) {
 //   3. The group(s) with the smallest total imbalance are preferred.
 //   4. A biased coin (p = 0.80) selects among preferred vs other groups.
 //
+// Unequal allocation is supported via allocation weights. When
+// weights differ, factor counts and group sizes are normalized by
+// allocation proportion before computing the range, so the algorithm
+// targets the specified ratio (e.g. 2:1) instead of equal groups.
+//
 // When sex-specific binning is enabled, weight and BMD tercile
 // boundaries are computed separately for males and females. Factor
 // levels become sex-prefixed (e.g. M0, M1, M2, F0, F1, F2) so the
@@ -1021,9 +1095,12 @@ function shuffleArray(arr,rng) {
 // rather than balancing bins that mostly recapitulate sex.
 // ═══════════════════════════════════════════════════════════
 
-function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins) {
+function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins, weights) {
   const rng = seededRandom(seed);
   const groupCol = colMap.group || 'Group';
+  // Normalize weights to proportions
+  const totalW = weights.reduce((a,b)=>a+b,0);
+  const wProps = weights.map(w=>w/totalW);
 
   function isMale(row) {
     return (row[colMap.sex]||'').trim().toLowerCase().startsWith('m');
@@ -1098,6 +1175,14 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins) {
 
   const biasP = 0.80;
 
+  // Weighted imbalance: normalize counts by allocation proportion,
+  // then compute range. This reduces to the original max-min when
+  // all weights are equal.
+  function weightedRange(counts) {
+    const norm = counts.map((c,g) => c / wProps[g]);
+    return Math.max(...norm) - Math.min(...norm);
+  }
+
   for (const idx of order) {
     const f = getFactors(data[idx]);
 
@@ -1107,11 +1192,11 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins) {
       for (const [fname, levels] of Object.entries(fc)) {
         const lvl = f[fname];
         const hyp = levels[lvl].map((c,g) => g===gi ? c+1 : c);
-        imb[gi] += Math.max(...hyp) - Math.min(...hyp);
+        imb[gi] += weightedRange(hyp);
       }
       // Total count balance
       const hCounts = gCounts.map((c,g)=>g===gi?c+1:c);
-      imb[gi] += Math.max(...hCounts) - Math.min(...hCounts);
+      imb[gi] += weightedRange(hCounts);
     }
 
     const minImb = Math.min(...imb);
@@ -1140,10 +1225,17 @@ function minimizationRandomize(data, nGroups, labels, seed, sexSpecificBins) {
 // ═══════════════════════════════════════════════════════════
 // Stratified Block Randomization
 // ═══════════════════════════════════════════════════════════
-function stratifiedBlockRandomize(data, nGroups, labels, seed) {
+function stratifiedBlockRandomize(data, nGroups, labels, seed, weights) {
   const rng = seededRandom(seed);
   const groupCol = colMap.group || 'Group';
   const result = data.map(r=>({...r}));
+
+  // Build block template from weights: e.g. weights [2,1] → [0,0,1]
+  const blockTemplate = [];
+  for (let gi=0; gi<nGroups; gi++) {
+    for (let w=0; w<weights[gi]; w++) blockTemplate.push(gi);
+  }
+  const blockSize = blockTemplate.length;
 
   const unassigned = { M: [], F: [] };
   data.forEach((r,i)=>{
@@ -1155,11 +1247,11 @@ function stratifiedBlockRandomize(data, nGroups, labels, seed) {
 
   for (const sex of ['M','F']) {
     const indices = shuffleArray(unassigned[sex], rng);
-    for (let b=0; b<indices.length; b+=nGroups) {
-      const block = indices.slice(b, b+nGroups);
-      const perm = shuffleArray(Array.from({length:nGroups},(_,i)=>i), rng);
+    for (let b=0; b<indices.length; b+=blockSize) {
+      const block = indices.slice(b, b+blockSize);
+      const perm = shuffleArray([...blockTemplate], rng);
       for (let k=0; k<block.length; k++) {
-        result[block[k]][groupCol] = labels[perm[k % nGroups]];
+        result[block[k]][groupCol] = labels[perm[k % blockSize]];
       }
     }
   }
@@ -1244,17 +1336,20 @@ function checkCageBalance(data, labels) {
 }
 
 // ─── Pre-assignment feasibility ─────────────────────────
-function checkFeasibility(data, nGroups, labels) {
+function checkFeasibility(data, nGroups, labels, weights) {
   if (preassignedIndices.size===0) return null;
   const groupCol = colMap.group;
-  const target = Math.round(data.length/nGroups);
+  const totalW = weights.reduce((a,b)=>a+b,0);
   const pre = {}; labels.forEach(l=>pre[l]=0);
   preassignedIndices.forEach(idx=>{
     const g=(data[idx][groupCol]||'').trim();
     if (labels.includes(g)) pre[g]++;
   });
   const warnings = [];
-  for (const [label,count] of Object.entries(pre)) {
+  for (let i=0; i<labels.length; i++) {
+    const label = labels[i];
+    const target = Math.round(data.length * weights[i] / totalW);
+    const count = pre[label] || 0;
     if (count > target+1) warnings.push(`"${label}" already has ${count} pre-assigned mice (target ~${target}). Perfect balance may not be achievable.`);
   }
   return warnings.length>0 ? warnings : null;
@@ -1272,6 +1367,7 @@ fileInput.addEventListener('change',()=>{if(fileInput.files.length)handleFile(fi
 
 $('clearFile').addEventListener('click',()=>{
   parsedData=[]; rawCSVText=''; results=null; blindingMap=null; fileInput.value=''; parseWarnings=[];
+  groupWeights = groupWeights.map(()=>1);
   $('uploadZone').classList.remove('hidden'); $('fileLoaded').classList.add('hidden');
   $('fileStats').classList.add('hidden'); $('fileMsg').classList.add('hidden');
   $('parseWarnMsg').classList.add('hidden');
@@ -1326,23 +1422,42 @@ function showStats() {
 }
 
 $('decGroups').addEventListener('click',()=>{
-  if(numGroups>2){numGroups--;$('numGroupsDisplay').textContent=numGroups;groupLabels=groupLabels.slice(0,numGroups);renderGroupLabels();updatePreassignedMsg();}
+  if(numGroups>2){numGroups--;$('numGroupsDisplay').textContent=numGroups;groupLabels=groupLabels.slice(0,numGroups);groupWeights=groupWeights.slice(0,numGroups);renderGroupLabels();updatePreassignedMsg();}
 });
 $('incGroups').addEventListener('click',()=>{
-  if(numGroups<8){numGroups++;$('numGroupsDisplay').textContent=numGroups;while(groupLabels.length<numGroups)groupLabels.push('Group '+groupLabels.length);renderGroupLabels();updatePreassignedMsg();}
+  if(numGroups<8){numGroups++;$('numGroupsDisplay').textContent=numGroups;while(groupLabels.length<numGroups)groupLabels.push('Group '+groupLabels.length);while(groupWeights.length<numGroups)groupWeights.push(1);renderGroupLabels();updatePreassignedMsg();}
 });
 
 function renderGroupLabels() {
   const c=$('groupLabels');
   while(groupLabels.length<numGroups) groupLabels.push('Group '+(groupLabels.length+1));
+  while(groupWeights.length<numGroups) groupWeights.push(1);
   const canDel=numGroups>2;
   c.innerHTML=groupLabels.slice(0,numGroups).map((l,i)=>
     `<div class="group-label-input${canDel?' can-delete':''}"><div class="tag dot-${i%8}"></div><input type="text" value="${l}" data-index="${i}" placeholder="Group ${i+1}"><button class="delete-group" data-index="${i}" title="Remove group">&times;</button></div>`
   ).join('');
   c.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{groupLabels[parseInt(e.target.dataset.index)]=e.target.value;}));
   c.querySelectorAll('.delete-group').forEach(btn=>btn.addEventListener('click',e=>{
-    const idx=parseInt(e.currentTarget.dataset.index); groupLabels.splice(idx,1); numGroups--;
+    const idx=parseInt(e.currentTarget.dataset.index); groupLabels.splice(idx,1); groupWeights.splice(idx,1); numGroups--;
     $('numGroupsDisplay').textContent=numGroups; renderGroupLabels(); updatePreassignedMsg();
+  }));
+  renderRatioInputs();
+}
+
+function renderRatioInputs() {
+  const c=$('ratioInputs');
+  const parts = groupWeights.slice(0,numGroups).map((w,i)=>{
+    const sep = i<numGroups-1 ? '<span class="ratio-sep">:</span>' : '';
+    return `<div class="ratio-input-wrap"><div class="tag dot-${i%8}"></div><input type="number" min="1" max="20" value="${w}" data-index="${i}"></div>${sep}`;
+  });
+  const totalW = groupWeights.slice(0,numGroups).reduce((a,b)=>a+b,0);
+  const pcts = groupWeights.slice(0,numGroups).map(w=>Math.round(w/totalW*100)+'%').join(' / ');
+  c.innerHTML = parts.join('') + `<span class="ratio-summary">(${pcts})</span>`;
+  c.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',e=>{
+    let v=parseInt(e.target.value); if(isNaN(v)||v<1) v=1; if(v>20) v=20;
+    e.target.value=v;
+    groupWeights[parseInt(e.target.dataset.index)]=v;
+    renderRatioInputs();
   }));
 }
 
@@ -1379,7 +1494,8 @@ function doRandomize() {
   else lastSeed = Date.now()^(Math.random()*0xFFFFFFFF>>>0);
 
   // Feasibility
-  const fw=checkFeasibility(parsedData,numGroups,labels);
+  const weights = groupWeights.slice(0,numGroups);
+  const fw=checkFeasibility(parsedData,numGroups,labels,weights);
   const fm=$('feasibilityMsg');
   if(fw){fm.textContent=fw.join(' ');fm.classList.remove('hidden');}else fm.classList.add('hidden');
 
@@ -1397,9 +1513,10 @@ function doRandomize() {
   // Algorithm
   lastAlgorithm=$('algoSelect').value;
   lastSexSpecificBins=$('sexBinToggle').checked;
+  lastWeights = weights;
   results = lastAlgorithm==='minimization'
-    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed,lastSexSpecificBins)
-    : stratifiedBlockRandomize(parsedData,numGroups,labels,lastSeed);
+    ? minimizationRandomize(parsedData,numGroups,labels,lastSeed,lastSexSpecificBins,weights)
+    : stratifiedBlockRandomize(parsedData,numGroups,labels,lastSeed,weights);
 
   // Blinding
   const blind=$('blindToggle').checked;
@@ -1422,9 +1539,12 @@ function showResults(displayLabels, origLabels) {
   const gc=colMap.group;
 
   // Summary cards
+  const totalW = lastWeights.reduce((a,b)=>a+b,0);
+  const isWeighted = !lastWeights.every(w=>w===lastWeights[0]);
   $('summaryGrid').innerHTML = displayLabels.map((label,gi)=>{
     const mice=results.filter(r=>(r[gc]||'').trim()===label);
     const n=mice.length;
+    const targetN = Math.round(results.length * lastWeights[gi] / totalW);
     const mM=mice.filter(r=>(r[colMap.sex]||'').trim().toLowerCase().startsWith('m'));
     const fM=mice.filter(r=>!(r[colMap.sex]||'').trim().toLowerCase().startsWith('m'));
     const avg=(a,c)=>a.length?mean(a.map(r=>parseFloat(r[c]))):null;
@@ -1432,9 +1552,10 @@ function showResults(displayLabels, origLabels) {
     const mn=(a,c)=>a.length?Math.min(...a.map(r=>parseFloat(r[c]))):null;
     const mx=(a,c)=>a.length?Math.max(...a.map(r=>parseFloat(r[c]))):null;
     const fw=v=>v!==null?v.toFixed(1):'-', fb=v=>v!==null?v.toFixed(4):'-';
+    const targetHint = isWeighted ? ` <span style="color:var(--text-tertiary);font-size:0.78rem">(target ~${targetN})</span>` : '';
     return `<div class="summary-card">
       <div class="group-name"><div class="dot dot-${gi%8}"></div>${label}</div>
-      <div class="details">n = <span>${n}</span> &nbsp;(♂ <span>${mM.length}</span> · ♀ <span>${fM.length}</span>)</div>
+      <div class="details">n = <span>${n}</span>${targetHint} &nbsp;(♂ <span>${mM.length}</span> · ♀ <span>${fM.length}</span>)</div>
       <table class="summary-table">
         <thead><tr><th></th><th>Weight (g)</th><th>BMD</th></tr></thead>
         <tbody>
@@ -1464,7 +1585,9 @@ function showResults(displayLabels, origLabels) {
     }
   } else $('cageBalanceSection').classList.add('hidden');
 
-  $('seedDisplay').innerHTML=`Seed: <code>${lastSeed}</code> &nbsp;·&nbsp; PRNG: <code>Mulberry32</code>`;
+  const seedIsWeighted = !lastWeights.every(w=>w===lastWeights[0]);
+  const ratioInfo = seedIsWeighted ? ` &nbsp;·&nbsp; Ratio: <code>${lastWeights.join(':')}</code>` : '';
+  $('seedDisplay').innerHTML=`Seed: <code>${lastSeed}</code> &nbsp;·&nbsp; PRNG: <code>Mulberry32</code>${ratioInfo}`;
 
   // Assignment table
   const tw=$('tableWrapper'), dh=headers.filter(h=>h);
@@ -1559,6 +1682,8 @@ $('copyStatsBtn').addEventListener('click',()=>{
   const mx=(a,c)=>a.length?Math.max(...a.map(r=>parseFloat(r[c]))):null;
 
   let t='';
+  const csIsWeighted = !lastWeights.every(w=>w===lastWeights[0]);
+  if (csIsWeighted) t+=`Allocation ratio: ${lastWeights.join(':')}\n\n`;
 
   // Per-group summaries
   dLabels.forEach(label=>{
@@ -1624,7 +1749,7 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='1. GENERAL INFORMATION\n';
   r+='───────────────────────────────────────────────────────────────\n';
   r+=`  Date/Time:           ${new Date().toISOString()}\n`;
-  r+=`  Software:            Mouse Randomizer v2.1\n`;
+  r+=`  Software:            Mouse Randomizer v2.2\n`;
   r+=`  Website:             https://khoslalab.github.io/mouse-randomizer/\n`;
   r+=`  CSV parser:          Papa Parse 5.4.1\n`;
   r+=`  Algorithm:           ${algoFull}\n`;
@@ -1641,12 +1766,20 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+=`  Blinding:            ${blindingMap?'Enabled (allocation concealment)':'Disabled'}\n`;
   r+=`  Total animals:       ${results.length}\n`;
   r+=`  Number of groups:    ${numGroups}\n`;
+  const rptWeights = lastWeights;
+  const rptIsWeighted = !rptWeights.every(w=>w===rptWeights[0]);
+  r+=`  Allocation ratio:   ${rptWeights.join(':') }${rptIsWeighted?'':' (equal)'}\n`;
   r+=`  Pre-assigned:        ${preassignedIndices.size}\n`;
   r+=`  Newly assigned:      ${results.length-preassignedIndices.size}\n\n`;
 
   r+='2. GROUP LABELS\n';
   r+='───────────────────────────────────────────────────────────────\n';
-  dLabels.forEach((l,i)=>r+=`  Group ${i+1}: ${l}\n`);
+  const rptTotalW = rptWeights.reduce((a,b)=>a+b,0);
+  dLabels.forEach((l,i)=>{
+    const pct = Math.round(rptWeights[i]/rptTotalW*100);
+    const targetN = Math.round(results.length * rptWeights[i] / rptTotalW);
+    r+=`  Group ${i+1}: ${l}` + (rptIsWeighted ? `  (weight ${rptWeights[i]}, ~${pct}%, target ~${targetN})` : '') + '\n';
+  });
   r+='\n';
 
   r+='3. GROUP SUMMARY STATISTICS\n';
@@ -1735,24 +1868,27 @@ $('downloadReportBtn').addEventListener('click',()=>{
   r+='───────────────────────────────────────────────────────────────\n';
   if(lastAlgorithm==='minimization'){
     const binDesc = lastSexSpecificBins ? 'sex-specific tercile-binned' : 'tercile-binned';
+    const ratioDesc = rptIsWeighted ? ` with a ${rptWeights.join(':')} allocation ratio` : '';
     r+='  Mice were assigned to treatment groups using covariate-\n';
     r+='  adaptive minimization inspired by the method of Pocock &\n';
-    r+=`  Simon (1975), balancing on sex (categorical), body weight\n`;
-    r+=`  (continuous, ${binDesc}), and spine BMD (continuous,\n`;
-    r+=`  ${binDesc}) with a biased-coin probability of 0.80.\n`;
+    r+=`  Simon (1975)${ratioDesc}, balancing on sex (categorical),\n`;
+    r+=`  body weight (continuous, ${binDesc}), and spine BMD\n`;
+    r+=`  (continuous, ${binDesc}) with a biased-coin probability\n`;
+    r+='  of 0.80.\n';
     if (lastSexSpecificBins) {
       r+='  Tercile boundaries for weight and BMD were computed\n';
       r+='  separately within each sex. ';
     } else {
       r+='  ';
     }
-    r+='Randomization was performed using Mouse Randomizer v2.1\n';
+    r+='Randomization was performed using Mouse Randomizer v2.2\n';
     r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
   } else {
+    const ratioDesc = rptIsWeighted ? ` with a ${rptWeights.join(':')} allocation ratio` : '';
     r+='  Mice were assigned to treatment groups using stratified\n';
-    r+='  block randomization, stratified by sex. Randomization was\n';
-    r+='  performed using Mouse Randomizer v2.1 (Mulberry32 PRNG,\n';
-    r+=`  seed: ${lastSeed}).\n`;
+    r+=`  block randomization${ratioDesc}, stratified by sex.\n`;
+    r+='  Randomization was performed using Mouse Randomizer v2.2\n';
+    r+=`  (Mulberry32 PRNG, seed: ${lastSeed}).\n`;
   }
   r+='═══════════════════════════════════════════════════════════════\n';
   dl(r,'text/plain',datePrefix()+'_randomization_report.txt');

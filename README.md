@@ -35,9 +35,10 @@ groups while balancing on sex, weight, and BMD.
 - **Cage distribution check** — If your CSV includes a "Cage" column, the
   app flags any cages where all mice ended up in the same treatment group.
   If no Cage column is present, the app automatically infers cage numbers
-  from the standard Animal ID format (`[text][cageNumber].[mouseNumber]`,
-  e.g. `VQ10.1.1` → cage 10), so cage balance is checked by default for
-  data following this convention.
+  from the standard Animal ID format (`[text][cageNumber].[mouseID]`,
+  e.g. `VQ10.1.1` → cage 10, `VQ16.L1` → cage 16), so cage balance is
+  checked by default for data following this convention. Mouse identifiers
+  after the dot can be numeric or alphanumeric.
 - **Reproducibility and audit trail** — Optionally specify a seed for
   exact reproducibility. Download a full randomization report including:
   timestamp, algorithm parameters, PRNG name (Mulberry32), seed, input
@@ -53,6 +54,11 @@ groups while balancing on sex, weight, and BMD.
   explicitly if pre-assigned labels don't match configured group labels.
 - **Flexible group configuration** — Choose 2–8 groups with custom labels
   (defaults to "Vehicle" and "AP").
+- **Unequal allocation ratios** — Assign different weights to each group
+  (e.g., 2:1 or 3:1) to allocate more mice to a control or treatment arm.
+  Both the minimization and stratified block algorithms respect the
+  specified ratio while still balancing covariates. The ratio is documented
+  in the randomization report and suggested methods statement.
 - **Robust CSV parsing** — Uses [Papa Parse](https://www.papaparse.com/)
   v5.4.1 (inlined, no CDN dependency) for reliable handling of quoted
   fields, embedded commas, mixed line endings, and other CSV edge cases.
@@ -81,8 +87,9 @@ Your CSV should include the following columns (naming is flexible):
 
 If no Cage column is present, the app will attempt to infer cage numbers
 from the Animal ID column using the format
-`[text][cageNumber].[mouseNumber]` (e.g., `VQ2.1` → cage 2, `VQ10.1.1` →
-cage 10).
+`[text][cageNumber].[mouseID]` (e.g., `VQ2.1` → cage 2, `VQ10.1.1` →
+cage 10, `VQ16.L1` → cage 16). Mouse identifiers after the dot can be
+numeric or alphanumeric.
 
 If you don't have a CSV yet, click **Download template CSV** inside the
 app to get a blank one with the correct headers.
@@ -91,6 +98,9 @@ app to get a blank one with the correct headers.
 
 - Drag and drop your CSV onto the upload zone, or click to browse.
 - Set the number of treatment groups and edit labels as needed.
+- Adjust the **allocation ratio** if you need unequal group sizes (e.g.,
+  3:1 to put three times as many mice in the control group). Leave all
+  weights at 1 for equal allocation.
 - Choose your randomization method: **Minimization (Pocock–Simon
   inspired)** for multi-covariate balancing, or **Stratified block
   randomization** for sex-only stratification.
@@ -148,7 +158,10 @@ formulation.
     - BMD tercile (low/mid/high)
     - Total group size
 3. For each factor, imbalance is measured as the range (max − min) of
-   counts across groups for the relevant factor level.
+   counts across groups for the relevant factor level. When unequal
+   allocation ratios are specified, counts are normalized by each group's
+   target proportion before computing the range, so the algorithm targets
+   the specified ratio (e.g., 2:1) rather than equal group sizes.
 4. The total imbalance for each candidate group is the sum of ranges
    across all factors.
 5. The group(s) with the lowest total imbalance are preferred. A biased
@@ -161,7 +174,10 @@ formulation.
 
 1. Mice are separated by sex into two strata.
 2. Within each stratum, mice are shuffled randomly, then divided into
-   blocks of size equal to the number of groups.
+   blocks. With equal allocation, block size equals the number of groups.
+   With unequal allocation (e.g., weights 2:1), each block contains
+   group slots proportional to the weights (e.g., [A, A, B]), so the
+   target ratio is maintained within every complete block.
 3. Each block receives a random permutation of group assignments.
 4. Pre-assigned mice are respected; only unassigned mice are processed.
 
